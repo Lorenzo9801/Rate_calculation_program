@@ -1,0 +1,20 @@
+[settings]
+ZI = 29
+AI = 64
+K_i = 50
+Ze = 1
+I0 = 0.001
+rhot=8.9
+I= 64CU
+slice=5e-3
+
+[costants]
+Mp=938.27208816
+q_ele = 1.60217662e-19
+cs=299792458
+NA=6.0221409e23
+
+
+[paths]
+sezione_urto: data/cross section 64Ni(p,n)64Cu.txt
+stopping_power: data/stopping power 50 MeV.txt
