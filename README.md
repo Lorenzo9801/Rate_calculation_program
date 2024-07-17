@@ -64,3 +64,5 @@ To show you some results:
 
 2) this is the fitting of the stopping power of protons with initial kinetic energy trought a nickel target
 ![config](./images/Stopping_power_fitting.png)
+
+The value of the estimated rate is:  986308679.834243  s^-1
