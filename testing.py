@@ -7,7 +7,6 @@ import hypothesis
 from hypothesis import strategies as st
 from hypothesis import settings
 from hypothesis import given
-import data
 import pandas as pd
 import os
 import configparser
