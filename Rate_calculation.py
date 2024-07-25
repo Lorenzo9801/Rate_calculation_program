@@ -1,12 +1,12 @@
 
-# Dato un target di un un certo materiale e un fascio di nuclei proiettili 
-#si vuole misurare il rate totale di reazione all'interno del target
-#I dati riportati valgono per la reazione 64Ni(p,n)64Cu
+# Given a target made of a certain material and a beam of projectile nuclei
+# we want to measure the total reaction rate within the target
+# The provided data apply to the reaction 64Ni(p,n)64Cu
 
-#installare libreria
-#pip install --user npat
+# install the library
+# pip install --user npat
 
-#si importa una libreria contenente dati di fisica nucleare
+# import a library containing nuclear physics data
 
 from npat import Isotope 
 import numpy as np
