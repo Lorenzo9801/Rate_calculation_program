@@ -124,20 +124,20 @@ def Integral(n_slice, Val_I1, Val_I2, Val_I3, Val_I4, Val_I5, Val_I6, Val_I7, Va
     NT=0.001*rhot*NA*5/PA
 
     rval = 0
-    iktmp=0
-    fktmp = 0
+    k_e_slice=0
+    final_k_e = 0
 
 
     for k in range(n_slice): # This is the actual integral.
   
-        iktmp = K_i - stopping_power(( slice * k ),Val_I5,Val_I6,Val_I7,Val_I8,Val_I9)   # Kinetic energy in MeV in the k-th slice.
-        sgm = cross_section(iktmp,Val_I1,Val_I2,Val_I3,Val_I4)*10**(-22)  # calculate the cross-section in mm².
-        Itmp = I0 * np.sqrt(iktmp / K_i)  # Beam current in amperes (A) in the k-th slice.
+        k_e_slice = K_i - stopping_power(( slice * k ),Val_I5,Val_I6,Val_I7,Val_I8,Val_I9)   # Kinetic energy in MeV in the k-th slice.
+        sgm = cross_section(k_e_slice,Val_I1,Val_I2,Val_I3,Val_I4)*10**(-22)  # calculate the cross-section in mm².
+        Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * (q_ele*10**6))  # Number of particles in the beam in the k-th slice.
         rtmp = (nptmp * NT * sgm)  # I calculate the rate in the k-th slice.
-        if iktmp <= fktmp:
+        if k_e_slice <= final_k_e:
             rval= rtmp + rval
-        fktmp = iktmp
+        final_k_e = k_e_slice
 
 
 

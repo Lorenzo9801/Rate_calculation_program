@@ -14,7 +14,7 @@ import configparser
 
 
 # test if with such initial values for the cross section function I obtain a positive value
-@given(x=st.just(10),xc=st.just(10),A=st.just(10),sigma=st.just(0.5),tau=st.just(2))
+@given(x=st.just(10),xc=st.just(10),A=st.just(1),sigma=st.just(1),tau=st.just(1))
 def test_cross_section(x,xc,A,sigma,tau):
     model= functions_definition.cross_section(x,xc,A,sigma,tau)
     assert model>0

@@ -6,7 +6,8 @@ Ze = 1
 I0 = 0.001
 rhot=8.9
 I= 64CU
-slice=5e-3
+slice=5e-3 
+
 
 [costants]
 Mp=938.27208816
