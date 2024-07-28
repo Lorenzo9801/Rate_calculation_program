@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 19 13:47:17 2024
 
-@author: chiaralucelorenzoalice.it
-"""
 
 from numpy import exp
 from scipy import special
@@ -17,14 +11,48 @@ import configparser
 from npat import Isotope
 from numpy import log as ln
 
-# I have defined the function for fitting the cross section as the convolution between an exponential and a Gaussian.
+
 def cross_section(x,xc,A,sigma,tau):
+    """
+    Calculate the cross-section value used for fitting experimental data.
+
+    This function represents a convolution of a Gaussian and an exponential 
+    function, often used in fitting processes to model the cross-section data.
+
+    Parameters:
+        x (float): The independent variable for which the cross-section is calculated.
+        xc (float): The x-value at which the cross-section reaches its maximum.
+        A (float): The amplitude of the Gaussian function.
+        sigma (float): The standard deviation of the Gaussian function, which controls its width.
+        tau (float): The decay constant of the exponential function.
+
+    Returns:
+        float: The calculated cross-section value for fitting.
+    """
+    
     y=0.5*(A/tau)*exp((0.5*(sigma/tau)**2-(x-xc)/tau))*(1+special.erf(((x-xc)/sigma-sigma/tau)/sqrt(2)))
     return y
 
-# I have defined the function for fitting the stopping power as the convolution between an exponential and a Gaussian, 
-# from which a constant is subtracted.
+
 def stopping_power(x,xc,A,sigma,tau,C1):
+    """
+    Calculate the stopping power value used for fitting experimental data.
+
+    This function represents a convolution of a Gaussian and an exponential 
+    function, often used in fitting processes to model the stopping power data.
+
+    Parameters:
+        x (float): The independent variable for which the stopping power is calculated.
+        xc (float): The x-value at which the stopping power reaches its maximum.
+        A (float): The amplitude of the Gaussian function.
+        sigma (float): The standard deviation of the Gaussian function, which controls its width.
+        tau (float): The decay constant of the exponential function.
+        C1 (float): Additional constant parameter.
+
+    Returns:
+        float: The calculated stopping power value for fitting.
+    """
+    
     y=0.5*(A/tau)*exp(0.5*(sigma/tau)**2+(x-xc)/tau)*(1+special.erf(((xc-x)/sigma-sigma/tau)/sqrt(2)))- np.piecewise(x, [x <= xc, x > xc], [C1, 0])
     return y
 
