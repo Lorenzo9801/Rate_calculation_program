@@ -5,7 +5,7 @@ from scipy import special
 from numpy import sqrt
 import numpy as np
 import matplotlib.pyplot as plt 
-from lmfit import Model
+from lmfit import Model, Parameters
 import pylab as py
 import configparser
 from npat import Isotope
@@ -58,31 +58,35 @@ def stopping_power(x,xc,A,sigma,tau,C1):
 
 # fitting both the cross section and the stopping power
 # IF YOU ARE FITTING THE STOPPING POWER USE AS title "Stopping power"
-def Fitting(title,theorical_function,data_file,A,sigma,tau, C1):
+def Fitting(model_function,data_file,**init_params):
 
     X_Data=data_file[:,0]  #import the data from the data file
     Y_Data=data_file[:,1]
 
-    model=Model(theorical_function) # use a theorical funcion as a model for the fitting
+    model=Model(model_function) # use a theorical funcion as a model for the fitting
         
  # The term xc1 is the value of x corresponding to the maximum y
-    initial_value_xc1= X_Data[np.where(Y_Data == np.max(Y_Data))].item() 
+    initial_xc= X_Data[np.where(Y_Data == np.max(Y_Data))].item() 
 
+    parameters = Parameters()
+    parameters.add('xc', value=initial_xc)
+    for param_name, init_value in init_params.items():
+     parameters.add(param_name, value=init_value)
 # If we are fitting the stopping power, we will need an additional parameter, C1.
-    if title == "Stopping power":
-        parameters1=model.make_params(xc=initial_value_xc1,A=A,sigma=sigma,tau=tau, C1 = C1 )
-        parameters1['C1'].vary=True
-        theorical_x=py.arange(0,5,0.001)
-    else: 
-        parameters1=model.make_params(xc=initial_value_xc1,A=A,sigma=sigma,tau=tau )
-        theorical_x=py.arange(0,25,0.001)
+#    if title == "Stopping power":
+#        parameters1=model.make_params(xc=initial_value_xc1,A=A,sigma=sigma,tau=tau, C1 = C1 )
+#        parameters1['C1'].vary=True
+#        theorical_x=py.arange(0,5,0.001)
+#    else: 
+#        parameters1=model.make_params(xc=initial_value_xc1,A=A,sigma=sigma,tau=tau )
+#        theorical_x=py.arange(0,25,0.001)
 
-    parameters1['xc'].vary=True
-    parameters1['A'].vary=True
-    parameters1['sigma'].vary=True
-    parameters1['tau'].vary=True
-
-    theorical_y=model.fit(Y_Data,params=parameters1,x=X_Data)
+#    parameters1['xc'].vary=True
+#    parameters1['A'].vary=True
+#    parameters1['sigma'].vary=True
+#    parameters1['tau'].vary=True
+    theorical_x=py.arange(0,25,0.001)
+    theorical_y=model.fit(Y_Data,params=parameters,x=X_Data)
 
     return theorical_x,  theorical_y
 
