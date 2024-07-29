@@ -82,7 +82,7 @@ def Fitting(model_function,data_file,**init_params):
 
 
 # Make the plot of the data and of the fitting curve
-def Plotting(title,data_file, theorical_function,theorical_X, result):
+def Plotting(data_file, model_function,theorical_X, result):
 
 
     X_Data=data_file[:,0]
@@ -94,24 +94,32 @@ def Plotting(title,data_file, theorical_function,theorical_X, result):
     Val_I4 = result.params['tau'].value
       
     fig1 = plt.figure(1,figsize=(10,6))
-    plt.title(title)
+    
     plt.plot(X_Data,Y_Data,'b.')
 
 
     # If we are fitting the stopping power, we will need an additional parameter, C1.
-    if title == "Stopping power":
+    if model_function == stopping_power:
         Val_I5 =  result.params['C1'].value
-        plt.plot(theorical_X,theorical_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4, Val_I5))
+        plt.plot(theorical_X,model_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4, Val_I5))
+        plt.title("Stopping Power")
+        plt.xlabel("Distance (mm)")
+        plt.ylabel("<dE/dx> (Mev/mm)")
         plt.draw()
         plt.show()  
         return  Val_I1, Val_I2, Val_I3, Val_I4, Val_I5
 
-    else: 
-        plt.plot(theorical_X,theorical_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4))
+    elif model_function == cross_section: 
+        plt.plot(theorical_X,model_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4))
+        plt.title("Cross section")
+        plt.xlabel("Kinetic Energy (MeV)")
+        plt.ylabel("Cross Sectio (barn)")
         plt.draw()
         plt.show()  
         return Val_I1, Val_I2, Val_I3, Val_I4
 
+    else:
+        raise ValueError("model_function must be either 'stopping_power' or 'cross_section'")
 
 
 
