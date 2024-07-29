@@ -76,9 +76,10 @@ def Fitting(model_function,data_file,**init_params):
 
     min_x, max_x = X_Data.min(), X_Data.max()
     theorical_x = np.arange(min_x, max_x, (max_x - min_x) / 10000)
-    theorical_y=model.fit(Y_Data,params=parameters,x=X_Data)
+    result=model.fit(Y_Data,params=parameters,x=X_Data)
 
-    return theorical_x,  theorical_y
+   
+    return theorical_x,  result
 
 
 # Make the plot of the data and of the fitting curve
@@ -107,7 +108,7 @@ def Plotting(data_file, model_function,theorical_X, result):
         plt.ylabel("<dE/dx> (Mev/mm)")
         plt.draw()
         plt.show()  
-        return  Val_I1, Val_I2, Val_I3, Val_I4, Val_I5
+
 
     elif model_function == cross_section: 
         plt.plot(theorical_X,model_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4))
@@ -116,7 +117,7 @@ def Plotting(data_file, model_function,theorical_X, result):
         plt.ylabel("Cross Sectio (barn)")
         plt.draw()
         plt.show()  
-        return Val_I1, Val_I2, Val_I3, Val_I4
+
 
     else:
         raise ValueError("model_function must be either 'stopping_power' or 'cross_section'")

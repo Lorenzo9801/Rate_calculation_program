@@ -12,7 +12,7 @@ from npat import Isotope
 import numpy as np
 from numpy import log as ln
 import os
-from lmfit import Model
+from lmfit import Model, Parameters
 import matplotlib.pyplot as plt
 import pylab as py
 import configparser
@@ -33,9 +33,12 @@ print ( str(functions_definition.cross_section))
 
 #import data on cross-sections
 cross_section_data_file=np.loadtxt(os.path.expanduser(cross_section),comments='%')
-X_CS,Y_CS=functions_definition.Fitting(functions_definition.cross_section, cross_section_data_file,A=10,sigma=1,tau=1)
-functions_definition.Plotting(cross_section_data_file, functions_definition.cross_section, X_CS, Y_CS)
-Val_I1, Val_I2, Val_I3, Val_I4 = functions_definition.Plotting(cross_section_data_file, functions_definition.cross_section, X_CS, Y_CS)
+X_CS, result_CS=functions_definition.Fitting(functions_definition.cross_section, cross_section_data_file,A=10,sigma=1,tau=1)
+functions_definition.Plotting(cross_section_data_file, functions_definition.cross_section, X_CS, result_CS)
+Val_I1 = result_CS.params['xc'].value
+Val_I2 = result_CS.params['A'].value
+Val_I3 = result_CS.params['sigma'].value
+Val_I4 = result_CS.params['tau'].value
 
 
 #Importing data on stopping power.
@@ -43,10 +46,13 @@ stopping_power_data_file=np.loadtxt(os.path.expanduser(stopping_power),comments=
 
 
 
-X_SP,Y_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data_file,A=150,sigma=0.5,tau=2,C1=5)
-functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, Y_SP)
-Val_I5, Val_I6, Val_I7, Val_I8, Val_I9 = functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, Y_SP)
-
+X_SP,result_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data_file,A=150,sigma=0.5,tau=2,C1=5)
+functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, result_SP)
+Val_I5 = result_SP.params['xc'].value
+Val_I6 = result_SP.params['A'].value
+Val_I7 = result_SP.params['sigma'].value
+Val_I8 = result_SP.params['tau'].value
+Val_I9 = result_SP.params['C1'].value
 
 params_cross_section = {
     'xc': Val_I1,
