@@ -56,10 +56,24 @@ def stopping_power(x,xc,A,sigma,tau,C1):
     y=0.5*(A/tau)*exp(0.5*(sigma/tau)**2+(x-xc)/tau)*(1+special.erf(((xc-x)/sigma-sigma/tau)/sqrt(2)))- np.piecewise(x, [x <= xc, x > xc], [C1, 0])
     return y
 
-# fitting both the cross section and the stopping power
-# IF YOU ARE FITTING THE STOPPING POWER USE AS title "Stopping power"
-def Fitting(model_function,data,**init_params):
 
+def Fitting(model_function,data,**init_params):
+    """
+    Fit a model to experimental data.
+
+    This function applies a specified model to the experimental data. It starts with initial parameter values
+    provided by the user and adjusts them to best match the model to the data.
+
+    Parameters:
+        model_function (function): The model function used for fitting (e.g., cross_section or stopping_power).
+        data_file (numpy.ndarray): A 2D array where the first column is x-values and the second column is y-values.
+        **init_params: Initial values for the model parameters.
+
+    Returns:
+
+            - theorical_x (numpy.ndarray): X-values for plotting the fitted model curve.
+            - result (lmfit.model.ModelResult): The fit results, including parameter values and fit details.
+    """
     X_Data=data[:,0]  #import the data from the data file
     Y_Data=data[:,1]
 
