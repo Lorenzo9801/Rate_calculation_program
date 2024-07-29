@@ -58,10 +58,10 @@ def stopping_power(x,xc,A,sigma,tau,C1):
 
 # fitting both the cross section and the stopping power
 # IF YOU ARE FITTING THE STOPPING POWER USE AS title "Stopping power"
-def Fitting(model_function,data_file,**init_params):
+def Fitting(model_function,data,**init_params):
 
-    X_Data=data_file[:,0]  #import the data from the data file
-    Y_Data=data_file[:,1]
+    X_Data=data[:,0]  #import the data from the data file
+    Y_Data=data[:,1]
 
     model=Model(model_function) # use a theorical funcion as a model for the fitting
         
@@ -83,11 +83,11 @@ def Fitting(model_function,data_file,**init_params):
 
 
 # Make the plot of the data and of the fitting curve
-def Plotting(data_file, model_function,theorical_X, result):
+def Plotting(data, model_function,theorical_X, result):
 
 
-    X_Data=data_file[:,0]
-    Y_Data=data_file[:,1]
+    X_Data=data[:,0]
+    Y_Data=data[:,1]
 
     Val_I1 = result.params['xc'].value
     Val_I2 = result.params['A'].value
