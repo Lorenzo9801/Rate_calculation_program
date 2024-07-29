@@ -127,10 +127,10 @@ def Plotting(data_file, model_function,theorical_X, result):
 
 # Calculate a numerical integral deviding the path of projectil into n_slice
 # Use the fitting parameters to calculate the integral
-def Integral(n_slice, Val_I1, Val_I2, Val_I3, Val_I4, Val_I5, Val_I6, Val_I7, Val_I8, Val_I9):
+def Integral(n_slice, cs_params, sp_params, config_file):
     config = configparser.ConfigParser()
 
-    config.read('configuration.txt') # give the value of the parameters used to calcutate tthe integral
+    config.read(config_file) # give the value of the parameters used to calcutate tthe integral
     ZI = np.float(config.get('settings','ZI')) #Atomic number
     AI = np.float(config.get('settings','AI')) #Mass number
     K_i = np.float(config.get('settings','K_i')) #initial kinetic energy
@@ -160,8 +160,8 @@ def Integral(n_slice, Val_I1, Val_I2, Val_I3, Val_I4, Val_I5, Val_I6, Val_I7, Va
 
     for k in range(n_slice): # This is the actual integral.
   
-        k_e_slice = K_i - stopping_power(( slice * k ),Val_I5,Val_I6,Val_I7,Val_I8,Val_I9)   # Kinetic energy in MeV in the k-th slice.
-        sgm = cross_section(k_e_slice,Val_I1,Val_I2,Val_I3,Val_I4)*10**(-22)  # calculate the cross-section in mm².
+        k_e_slice = K_i - stopping_power(( slice * k ),**sp_params)   # Kinetic energy in MeV in the k-th slice.
+        sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * (q_ele*10**6))  # Number of particles in the beam in the k-th slice.
         rtmp = (nptmp * NT * sgm)  # I calculate the rate in the k-th slice.

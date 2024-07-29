@@ -45,7 +45,22 @@ stopping_power_data_file=np.loadtxt(os.path.expanduser(stopping_power),comments=
 
 X_SP,Y_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data_file,A=150,sigma=0.5,tau=2,C1=5)
 functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, Y_SP)
-Val_5, Val_I6, Val_I7, Val_I8, Val_I9 = functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, Y_SP)
+Val_I5, Val_I6, Val_I7, Val_I8, Val_I9 = functions_definition.Plotting(stopping_power_data_file, functions_definition.stopping_power, X_SP, Y_SP)
 
 
-functions_definition.Integral(1000,Val_I1, Val_I2, Val_I3, Val_I4, Val_5, Val_I6, Val_I7, Val_I8, Val_I9)
+params_cross_section = {
+    'xc': Val_I1,
+    'A': Val_I2,
+    'sigma': Val_I3,
+    'tau': Val_I4
+}
+
+params_stopping_power = {
+    'xc': Val_I5,
+    'A': Val_I6,
+    'sigma': Val_I7,
+    'tau': Val_I8,
+    'C1': Val_I9
+}
+
+functions_definition.Integral(1000,params_cross_section,params_stopping_power, "configuration.txt")
