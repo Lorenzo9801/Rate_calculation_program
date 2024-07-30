@@ -66,7 +66,7 @@ def Fitting(model_function,data,**init_params):
 
     Parameters:
         model_function (function): The model function used for fitting (e.g., cross_section or stopping_power).
-        data_file (numpy.ndarray): A 2D array where the first column is x-values and the second column is y-values.
+        data (numpy.ndarray): A 2D array where the first column is x-values and the second column is y-values.
         **init_params: Initial values for the model parameters.
 
     Returns:
@@ -98,6 +98,19 @@ def Fitting(model_function,data,**init_params):
 
 # Make the plot of the data and of the fitting curve
 def Plotting(data, model_function,theorical_X, result):
+    """
+    Plot the experimental data and the fitted model curve.
+
+    This function generates a plot comparing the experimental data to the fitted model
+    curve. It automatically adjusts the plot based on whether the model function is for
+    stopping power or cross section.
+
+    Parameters:
+        data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
+        model_function (function): The model function used for fitting (e.g. cross_section or stopping_power).
+        theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
+        result (lmfit.model.ModelResult): The result object containing the fit parameters.
+    """
 
 
     X_Data=data[:,0]
@@ -143,6 +156,22 @@ def Plotting(data, model_function,theorical_X, result):
 # Calculate a numerical integral deviding the path of projectil into n_slice
 # Use the fitting parameters to calculate the integral
 def Integral(n_slice, cs_params, sp_params, config_file):
+    """
+    Calculate the total reaction rate by integrating over the projectile path.
+
+    This function divides the projectile path into a specified number of slices, calculates
+    the kinetic energy, cross-section, and stopping power for each slice, and integrates
+    the reaction rate over the entire path.
+
+    Parameters:
+        n_slice (int): Number of slices to divide the projectile path into.
+        cs_params (dict): Dictionary of parameters for the cross-section model function.
+        sp_params (dict): Dictionary of parameters for the stopping power model function.
+        config_file (str): Path to the configuration file containing additional parameters (e.g. atomic numbers, initial kinetic energy).
+
+    Returns:
+        The function prints the estimated reaction rate.
+    """
     config = configparser.ConfigParser()
 
     config.read(config_file) # give the value of the parameters used to calcutate tthe integral
