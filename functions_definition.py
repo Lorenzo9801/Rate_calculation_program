@@ -52,7 +52,6 @@ def stopping_power(x,xc,A,sigma,tau,C1):
     Returns:
         float: The calculated stopping power value for fitting.
     """
-    
     y=0.5*(A/tau)*exp(0.5*(sigma/tau)**2+(x-xc)/tau)*(1+special.erf(((xc-x)/sigma-sigma/tau)/sqrt(2)))- np.piecewise(x, [x <= xc, x > xc], [C1, 0])
     return y
 
@@ -182,7 +181,7 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     I0 = np.float(config.get('settings','I0')) #initial beam current
     rhot = np.float(config.get('settings','rhot')) #target density
     I=config.get('settings', 'I') #isotope
-    slice=np.float(config.get('settings','slice')) #slice thickness in mm
+    total_thickness=np.float(config.get('settings','total_thickness')) #slice thickness in mm
     
 
     Iso=Isotope(I)
@@ -197,20 +196,22 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     NA= np.float(config.get('costants','NA')) #Avogadro number
     NT=0.001*rhot*NA*5/PA
 
+    slice_thickness = total_thickness / n_slice
+
     rval = 0
     k_e_slice=0
     final_k_e = 0
 
 
     for k in range(n_slice): # This is the actual integral.
-  
-        k_e_slice = K_i - stopping_power(( slice * k ),**sp_params)   # Kinetic energy in MeV in the k-th slice.
+        
+        k_e_slice = K_i - stopping_power(( slice_thickness * k ),**sp_params)   # Kinetic energy in MeV in the k-th slice.
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * (q_ele*10**6))  # Number of particles in the beam in the k-th slice.
         rtmp = (nptmp * NT * sgm)  # I calculate the rate in the k-th slice.
         if k_e_slice <= final_k_e:
-            rval= rtmp + rval
+            rval= rtmp*slice_thickness + rval
         final_k_e = k_e_slice
 
 
