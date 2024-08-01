@@ -72,6 +72,10 @@ def Fitting(model_function,data,**init_params):
 
             - theorical_x (numpy.ndarray): X-values for plotting the fitted model curve.
             - result (lmfit.model.ModelResult): The fit results, including parameter values and fit details.
+  
+    Raises:
+        ValueError: If the data is not a 2D numpy array with two columns.
+
     """
 
     if not isinstance(data, np.ndarray) or data.ndim != 2 or data.shape[1] != 2:
