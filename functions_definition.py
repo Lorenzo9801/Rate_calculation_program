@@ -117,6 +117,8 @@ def Plotting(data, model_function,theorical_X, result):
         model_function (function): The model function used for fitting (e.g. cross_section or stopping_power).
         theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
         result (lmfit.model.ModelResult): The result object containing the fit parameters.
+    Raises:
+        ValueError: If `model_function` is not either `stopping_power` or `cross_section`.
     """
 
 
