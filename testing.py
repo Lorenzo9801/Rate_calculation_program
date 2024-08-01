@@ -3,6 +3,15 @@ from functions_definition import cross_section, stopping_power, Fitting
 import numpy as np
 import pytest
 
+def test_fitting_invalid_data():
+    def model_function(x, xc):
+        return np.exp(-((x - xc)**2))
+
+    invalid_data = np.array([1, 0.5, 2, 0.7, 3, 0.2])  # Non è un array 2D
+    init_params = {}
+    
+    with pytest.raises(ValueError, match="Data should be a 2D numpy array with two columns"):
+        Fitting(model_function, invalid_data, **init_params)
 
 
 def test_fitting_cs_params_positive():
