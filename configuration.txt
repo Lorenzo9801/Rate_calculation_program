@@ -6,7 +6,7 @@ Ze = 1
 I0 = 0.001
 rhot=8.9
 I= 64CU
-slice=5e-3 
+total_thickness=5
 
 
 [costants]
