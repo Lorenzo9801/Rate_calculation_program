@@ -184,14 +184,14 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     config = configparser.ConfigParser()
 
     config.read(config_file) # give the value of the parameters used to calcutate tthe integral
-    ZI = np.float(config.get('settings','ZI')) #Atomic number
-    AI = np.float(config.get('settings','AI')) #Mass number
-    K_i = np.float(config.get('settings','K_i')) #initial kinetic energy
-    Ze = np.float(config.get('settings','Ze')) #charge state of the accelerated ion
-    I0 = np.float(config.get('settings','I0')) #initial beam current
-    rhot = np.float(config.get('settings','rhot')) #target density
+    ZI = float(config.get('settings','ZI')) #Atomic number
+    AI = float(config.get('settings','AI')) #Mass number
+    K_i = float(config.get('settings','K_i')) #initial kinetic energy
+    Ze = float(config.get('settings','Ze')) #charge state of the accelerated ion
+    I0 = float(config.get('settings','I0')) #initial beam current
+    rhot = float(config.get('settings','rhot')) #target density
     I=config.get('settings', 'I') #isotope
-    total_thickness=np.float(config.get('settings','total_thickness')) #slice thickness in mm
+    total_thickness=float(config.get('settings','total_thickness')) #slice thickness in mm
     
 
     Iso=Isotope(I)
@@ -200,30 +200,32 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     HL=(Iso.half_life(Iso.optimum_units())*3600) #half life of the isotope
     decay_constant=ln(2)/(HL) 
 
-    Mp= np.float(config.get('costants','Mp'))  #mass of a proton
-    q_ele= np.float(config.get('costants','q_ele')) #charge of an electtron
-    cs= np.float(config.get('costants','cs')) #speed of the light
-    NA= np.float(config.get('costants','NA')) #Avogadro number
+    Mp= float(config.get('costants','Mp'))  #mass of a proton
+    q_ele= float(config.get('costants','q_ele')) #charge of an electtron
+    cs= float(config.get('costants','cs')) #speed of the light
+    NA= float(config.get('costants','NA')) #Avogadro number
     NT=0.001*rhot*NA*5/PA
 
     slice_thickness = total_thickness / n_slice
 
+    cumulative_energy_loss = 0
     rval = 0
-    k_e_slice=0
-    final_k_e = 0
 
 
     for k in range(n_slice): # This is the actual integral.
-        
-        k_e_slice = K_i - stopping_power(( slice_thickness * k ),**sp_params)   # Kinetic energy in MeV in the k-th slice.
+        energy_loss = stopping_power(slice_thickness*k, **sp_params)*slice_thickness # Calculate the energy in the k-th slice
+        cumulative_energy_loss += energy_loss # Update the cumulative energy loss
+    
+        k_e_slice = K_i - cumulative_energy_loss  # Calculate the kinetic energy for this slice
+        if k_e_slice < 0:
+            print(f"Projectile energy is exhausted at slice {k}.")
+            k_e_slice = 0
+            break
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * (q_ele*10**6))  # Number of particles in the beam in the k-th slice.
-        rtmp = (nptmp * NT * sgm)  # I calculate the rate in the k-th slice.
-        if k_e_slice <= final_k_e:
-            rval= rtmp*slice_thickness + rval
-        final_k_e = k_e_slice
-
+        rval += nptmp * NT * sgm * slice_thickness  # Add reaction rate for this slice
 
 
     print("The value of the estimated rate is: ",rval," s^-1")
+    return rval
