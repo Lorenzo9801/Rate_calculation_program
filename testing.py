@@ -66,6 +66,13 @@ def test_fitting_sp_params_positive():
     assert params['tau'].value > 0, "Parameter 'tau' should be positive"
 
 def test_integral_invalid_energy_loss():
+    """
+    Test the `Integral` function when encountering extreme values for energy loss.
+
+    GIVEN: Mock implementations of `cross_section` and `stopping_power`, where `stopping_power` simulates a very high energy loss.
+    WHEN: The `Integral` function is called using these mock implementations.
+    THEN: The function should not return NaN, ensuring that it handles extreme energy loss values properly and does not produce invalid results.
+    """
     def mock_cross_section(energy, **params):
         return 1.0  # Simulates a constant cross-section function
     
