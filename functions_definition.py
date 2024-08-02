@@ -69,24 +69,23 @@ def Fitting(model_function,data,**init_params):
         **init_params: Initial values for the model parameters.
 
     Returns:
-
             - theorical_x (numpy.ndarray): X-values for plotting the fitted model curve.
-            - result (lmfit.model.ModelResult): The fit results, including parameter values and fit details.
+            - result (lmfit.model.ModelResult): The fit results, including parameter values.
   
     Raises:
         ValueError: If the data is not a 2D numpy array with two columns.
 
     """
 
-    if not isinstance(data, np.ndarray) or data.ndim != 2 or data.shape[1] != 2:
+    if not isinstance(data, np.ndarray) or data.ndim != 2:
         raise ValueError("Data should be a 2D numpy array with two columns (x and y values).")
     
     X_Data=data[:,0]  #import the data from the data file
     Y_Data=data[:,1]
 
-    model=Model(model_function) # use a theorical funcion as a model for the fitting
+    model=Model(model_function) # use a model_function as a model for the fitting
         
- # The term xc1 is the value of x corresponding to the maximum y
+    # The term xc1 is the value of x corresponding to the maximum y
     initial_xc= X_Data[np.where(Y_Data == np.max(Y_Data))].item() 
 
     parameters = Parameters()
@@ -94,9 +93,11 @@ def Fitting(model_function,data,**init_params):
     for param_name, init_value in init_params.items():
      parameters.add(param_name, value=init_value)
 
-
+    # Determine the range of x-values for generating the theoretical curve
     min_x, max_x = X_Data.min(), X_Data.max()
+    # Generate x-values over the range [min_x, max_x] with a high resolution for plotting
     theorical_x = np.arange(min_x, max_x, (max_x - min_x) / 10000)
+    # Fit the model to the data using the specified parameters
     result=model.fit(Y_Data,params=parameters,x=X_Data)
 
    
