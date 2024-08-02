@@ -60,12 +60,12 @@ def test_fitting_sp_params_positive():
 
 def test_integral_invalid_energy_loss():
     def mock_cross_section(energy, **params):
-        return 1.0  # Simula una funzione di cross-section costante
+        return 1.0  # Simulates a constant cross-section function
     
     def mock_stopping_power(distance, **params):
-        return 100.0  # Simula una perdita di energia molto alta
+        return 100.0  # Simulates a very high energy loss
 
-    # Parametri di esempio
+    # Example parameters
     cs_params = {}
     sp_params = {}
     config = 'configuration.txt'
@@ -75,8 +75,8 @@ def test_integral_invalid_energy_loss():
     with patch('functions_definition.cross_section', mock_cross_section), \
          patch('functions_definition.stopping_power', mock_stopping_power):
         
-        # Esegui il test
+        # Execute the test
         rval = Integral(10, cs_params, sp_params, config)
         
-        # Verifica che il risultato non sia NaN
+        # Verify that the result is not NaN
         assert not np.isnan(rval), "The result should not be NaN with correct implementation."
