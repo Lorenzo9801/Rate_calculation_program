@@ -1,7 +1,8 @@
 
-from functions_definition import cross_section, stopping_power, Fitting
+from functions_definition import cross_section, stopping_power, Fitting, Integral
 import numpy as np
 import pytest
+from unittest.mock import patch
 
 def test_fitting_invalid_data():
     def model_function(x, xc):
@@ -56,3 +57,26 @@ def test_fitting_sp_params_positive():
     assert params['A'].value > 0, "Parameter 'A' should be positive"
     assert params['sigma'].value > 0, "Parameter 'sigma' should be positive"
     assert params['tau'].value > 0, "Parameter 'tau' should be positive"
+
+def test_integral_invalid_energy_loss():
+    def mock_cross_section(energy, **params):
+        return 1.0  # Simula una funzione di cross-section costante
+    
+    def mock_stopping_power(distance, **params):
+        return 100.0  # Simula una perdita di energia molto alta
+
+    # Parametri di esempio
+    cs_params = {}
+    sp_params = {}
+    config = 'configuration.txt'
+
+
+
+    with patch('functions_definition.cross_section', mock_cross_section), \
+         patch('functions_definition.stopping_power', mock_stopping_power):
+        
+        # Esegui il test
+        rval = Integral(10, cs_params, sp_params, config)
+        
+        # Verifica che il risultato non sia NaN
+        assert not np.isnan(rval), "The result should not be NaN with correct implementation."
