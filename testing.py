@@ -5,6 +5,13 @@ import pytest
 from unittest.mock import patch
 
 def test_fitting_invalid_data():
+    """
+    Test the `Fitting` function with data that is not in the required format.
+
+    GIVEN: A 1D numpy array as input data, which should be a 2D array with two columns.
+    WHEN: The `Fitting` function is called with this 1D array as the input data.
+    THEN: The `Fitting` function should raise a ValueError indicating that the data should be a 2D numpy array with exactly two columns.
+    """
     def model_function(x, xc):
         return np.exp(-((x - xc)**2))
 
