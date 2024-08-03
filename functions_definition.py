@@ -221,6 +221,8 @@ def Integral(n_slice, cs_params, sp_params, config_file):
         if k_e_slice < 0:
             print(f"Projectile energy is exhausted at slice {k}.")
             k_e_slice = 0
+            projectil_path= slice_thickness*k
+            print(f"projectil stops at {projectil_path}mm.")
             break
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
