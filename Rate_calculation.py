@@ -1,23 +1,7 @@
 
-# Given a target made of a certain material and a beam of projectile nuclei
-# we want to measure the total reaction rate within the target
-# The provided data apply to the reaction 64Ni(p,n)64Cu
-
-# install the library
-# pip install --user npat
-
-# import a library containing nuclear physics data
-
-from npat import Isotope 
 import numpy as np
-from numpy import log as ln
 import os
-from lmfit import Model, Parameters
-import matplotlib.pyplot as plt
-import pylab as py
 import configparser
-import sys
-from sys import argv
 import functions_definition
 
 config = configparser.ConfigParser()
