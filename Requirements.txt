@@ -1,0 +1,6 @@
+numpy
+scipy
+matplotlib
+lmfit
+configparser
+pytest
