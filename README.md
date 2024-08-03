@@ -1,6 +1,30 @@
 # Rate_calculation_program
 
-The aim of this program is to calculate the total rate of a nuclear reaction (e.g. 64Ni(p,n)64Cu ).
+This repository contains a Python program designed to calculate the total reaction rate of a nuclear reaction (e.g. 64Ni(p,n)64Cu ). The program calculates the reaction rate by integrating over the thickness of the target material, taking into account the varying kinetic energy of the projectiles and the beam current intensity.
+
+The main steps of the used algorithm are:
+1.  Prepare data: Load and preprocess the experimental data for cross-sections and stopping power from the provided files.
+2.  Fit models: Apply curve-fitting techniques to the data to derive models for both the cross-section and stopping power.
+3.  Generate Plots: Create visualizations of the fitted models and the resulting reaction rates to aid in analysis and interpretation.
+4.  Calculate Energy Loss: For each slice of the target, compute the projectile's energy loss based on the stopping power model.
+5.  Numerical integration: Sum the reaction rates across all slices to get the total reaction rate.
+
+
+# Libraries
+To use this program, you need to install some Python libraries (you find them in [Requirements.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Requirements.txt)):numpy, scipy, matplotlib, lmfit, pytest, npat.
+You can install them by using the following command on your terminal: pip install -r requirements.txt
+
+# How to use the repository
+
+In order to use this program you need to:
+- install the libraries you find in [Requirements.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Requirements.txt);
+- Have a dataset of cross section of a nuclear reaction. This dataset should be structured as a txt file with two columns: the first column should list the projectile energy values (in MeV), and the second column should contain the corresponding cross-section values. You can source this data from experimental databases such as EXFOR. You can find an example of dataset in [cross section 64ni(p,n)64Cu.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/data/cross%20section%2064Ni(p%2Cn)64Cu.txt) ;
+- Have data of the stopping power of a projectil into the target. This dataset should be structured in a txt file with two columns: the first column should represent the depth of the projectile within the target (in units of distance), and the second column should indicate the energy loss per unit distance traveled. You can obtain this data using tools like the SRIM-2008 software. You can find an example of dataset in [stopping power 50 MeV.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/data/stopping%20power%2050%20MeV.txt);
+- set up the configuration, according to your nuclear reaction and according to your data files [configuration.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/configuration.txt);
+- You can launch the file [Rate_calculation](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Rate_calculation.py) which imports its parameters from configuration using ConfigParser library;
+- In the file [testing](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/testing.py) I have tested all the functions in [funcions_defintion](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/functions_definition.py) except Plotting function.
+
+# Theoretical references
 The total rate of a nuclear rection can be obtained thanks to the following expression: 
 ![equation1](https://latex.codecogs.com/gif.latex?rate=%5Csigma%5E%7Breac%7D(K_a)%20%5Ccdot%20%5Cfrac%7BI_a%7D%7BZ%20e%7D%20%5Ccdot%20%5Cfrac%7B%5Csigma_X%7D%7BA.W.%7D%5Ccdot%20N_A)
 
@@ -31,38 +55,13 @@ At this point, it is possible to determine the kinetic energy of a beam with ini
 Afterwards, a numerical integral over the thickness of the target will be performed to obtain the total rate.
 
 
+# To show you some results:
 
-# Structure of the program
-
-In order to use this program you need to:
-- install the library npat;
-- have data of cross section of a nuclear reaction (you can search on EXFOR);
-- have data of the stopping power of a projectil into the target (you can use SRIM-2008 software);
-- set up the configuration, according to your nuclear reaction and according to your data [configuration](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/configuration.txt).
-
-
-
-This is how I divided my project into blocks:
-
-- In [funcions_defintion](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/functions_definition.py) you can find the definition of all the function you need to calculate the total rate of nuclear reaction. Inside, you will find the definition of a function that fits both the data of the cross-section and the stopping power. You will also find a function that plots the graphs. Finally, there is a function that performs the numerical integration.
-
-
-- In the [configuration](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/configuration.txt) you can find the settings for the values of the nuclear reaction cross-sections, the values of some physical constants and the names of the data files.
-
-- In [data]((https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/data)) You can find the data for the cross-section of the nuclear reaction 64Ni(p,n)64Cu and the stopping power data for three different initial kinetic energies of the protons in a nickel target. 
-
-- In [Rate_calculation](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Rate_calculation.py) I use the function defined in [funcions_defintion](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/functions_definition.py) and using the data in [dat](https://github.com/Lorenzo9801/Rate_calculation_program/tree/main/data) to calculate the total cross section of the reaction 64Ni(p,n)64Cu where the protons have an initial kinetic energy of 50 MeV.
-
-- In [testing](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/testing.py) I test cross_section and stopping_power functions to ensure that all of them work properly, using hypothesis testing. I also test a part of the Fitting function, to be sure to have the right output both for the fitting of the cross section data and for the stopping power data.
-
-
-
-
-To show you some results:
 1) this is the fitting o the cross section data of the reaction 64Ni(p,n)64Cu 
 ![config](./images/Cross_section_fitting.png)
 
 2) this is the fitting of the stopping power of protons with initial kinetic energy trought a nickel target
 ![config](./images/Stopping_power_fitting.png)
 
-The value of the estimated rate is:  986308679.834243  s^-1
+The value of the estimated rate is: 34366051.66914378  s^-1
+
