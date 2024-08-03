@@ -6,7 +6,6 @@ from numpy import sqrt
 import numpy as np
 import matplotlib.pyplot as plt 
 from lmfit import Model, Parameters
-import pylab as py
 import configparser
 from npat import Isotope
 from numpy import log as ln
