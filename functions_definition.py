@@ -204,7 +204,7 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     q_ele= float(config.get('costants','q_ele')) #charge of an electtron
     cs= float(config.get('costants','cs')) #speed of the light
     NA= float(config.get('costants','NA')) #Avogadro number
-    NT=0.001*rhot*NA*5/PA
+    NT=0.01*rhot*NA*total_thickness/PA # Number of nuclei per unit area, where I multiply by 0.01 to express NT in nuclei per square millimeter (1/mm^2)
 
     slice_thickness = total_thickness / n_slice
 
@@ -225,8 +225,9 @@ def Integral(n_slice, cs_params, sp_params, config_file):
             break
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
-        nptmp = Itmp / (Ze * (q_ele*10**6))  # Number of particles in the beam in the k-th slice.
-        rval += nptmp * NT * sgm * slice_thickness  # Add reaction rate for this slice
+        nptmp = Itmp / (Ze * q_ele)  # Number of particles in the beam in the k-th slice.
+                                             # I multiply by 10^6 to convert mm^2 to m^2
+        rval += nptmp * NT * sgm   # Add reaction rate for this slice
 
 
     print("The value of the estimated rate is: ",rval," s^-1")
