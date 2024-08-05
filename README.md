@@ -20,8 +20,8 @@ In order to use this program you need to:
 - install the libraries you find in [Requirements.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Requirements.txt);
 - Have a dataset of cross section of a nuclear reaction. This dataset should be structured as a txt file with two columns: the first column should list the projectile energy values (in MeV), and the second column should contain the corresponding cross-section values. You can source this data from experimental databases such as EXFOR. You can find an example of dataset in [cross section 64ni(p,n)64Cu.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/data/cross%20section%2064Ni(p%2Cn)64Cu.txt) ;
 - Have data of the stopping power of a projectil into the target. This dataset should be structured in a txt file with two columns: the first column should represent the depth of the projectile within the target (in units of distance), and the second column should indicate the energy loss per unit distance traveled. You can obtain this data using tools like the SRIM-2008 software. You can find an example of dataset in [stopping power 50 MeV.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/data/stopping%20power%2050%20MeV.txt);
-- set up the configuration, according to your nuclear reaction and according to your data files [configuration.txt](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/configuration.txt);
-- You can launch the file [Rate_calculation](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Rate_calculation.py) which imports its parameters from configuration using ConfigParser library;
+- set up the configuration, according to your nuclear reaction and according to your data files ([configuration.txt])(https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/configuration.txt);
+- You can launch the file [Rate_calculation](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/Rate_calculation.py) which imports its parameters from configuration;
 - In the file [testing](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/testing.py) I have tested all the functions in [funcions_defintion](https://github.com/Lorenzo9801/Rate_calculation_program/blob/main/functions_definition.py) except Plotting function.
 
 # Theoretical references
@@ -57,7 +57,7 @@ Afterwards, a numerical integral over the thickness of the target will be perfor
 
 # To show you some results:
 
-1) this is the fitting o the cross section data of the reaction 64Ni(p,n)64Cu 
+1) this is the fitting o the cross section data of the reaction 64Ni(p,n)64Cu with an initial kinetic energy of the projectil of 50 MeV and  a current beam of 1mA
 ![config](./images/Cross_section_fitting.png)
 
 2) this is the fitting of the stopping power of protons with initial kinetic energy trought a nickel target
