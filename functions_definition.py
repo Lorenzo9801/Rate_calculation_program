@@ -13,8 +13,6 @@ from numpy import log as ln
 
 def cross_section(x,xc,A,sigma,tau):
     """
-    Calculate the cross-section value used for fitting experimental data.
-
     This function represents a convolution of a Gaussian and an exponential 
     function, often used in fitting processes to model the cross-section data.
 
@@ -26,7 +24,7 @@ def cross_section(x,xc,A,sigma,tau):
         tau (float): The decay constant of the exponential function.
 
     Returns:
-        float: The calculated cross-section value for fitting.
+        float: The calculated cross-section value.
     """
     
     y=0.5*(A/tau)*exp((0.5*(sigma/tau)**2-(x-xc)/tau))*(1+special.erf(((x-xc)/sigma-sigma/tau)/sqrt(2)))
@@ -35,8 +33,6 @@ def cross_section(x,xc,A,sigma,tau):
 
 def stopping_power(x,xc,A,sigma,tau,C1):
     """
-    Calculate the stopping power value used for fitting experimental data.
-
     This function represents a convolution of a Gaussian and an exponential 
     function, often used in fitting processes to model the stopping power data.
 
@@ -49,7 +45,7 @@ def stopping_power(x,xc,A,sigma,tau,C1):
         C1 (float): Additional constant parameter.
 
     Returns:
-        float: The calculated stopping power value for fitting.
+        float: The calculated stopping power value.
     """
     y=0.5*(A/tau)*exp(0.5*(sigma/tau)**2+(x-xc)/tau)*(1+special.erf(((xc-x)/sigma-sigma/tau)/sqrt(2)))- np.piecewise(x, [x <= xc, x > xc], [C1, 0])
     return y
@@ -63,13 +59,13 @@ def Fitting(model_function,data,**init_params):
     provided by the user and adjusts them to best match the model to the data.
 
     Parameters:
-        model_function (function): The model function used for fitting (e.g., cross_section or stopping_power).
+        model_function (function): The model function used for fitting (cross_section or stopping_power).
         data (numpy.ndarray): A 2D array where the first column is x-values and the second column is y-values.
         **init_params: Initial values for the model parameters.
 
     Returns:
             - theorical_x (numpy.ndarray): X-values for plotting the fitted model curve.
-            - result (lmfit.model.ModelResult): The fit results, including parameter values.
+            - result: The fit results, including parameter values.
   
     Raises:
         ValueError: If the data is not a 2D numpy array with two columns.
@@ -103,7 +99,7 @@ def Fitting(model_function,data,**init_params):
     return theorical_x,  result
 
 
-# Make the plot of the data and of the fitting curve
+
 def Plotting(data, model_function,theorical_X, result):
     """
     Plot the experimental data and the fitted model curve.
@@ -114,9 +110,9 @@ def Plotting(data, model_function,theorical_X, result):
 
     Parameters:
         data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
-        model_function (function): The model function used for fitting (e.g. cross_section or stopping_power).
-        theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
-        result (lmfit.model.ModelResult): The result object containing the fit parameters.
+        model_function (function): The model function used for fitting (cross_section or stopping_power).
+        theorical_X (numpy.ndarray): The x-values for plotting the theorical model curve.
+        result: The result object of the fit, containing the fit parameters.
     Raises:
         ValueError: If `model_function` is not either `stopping_power` or `cross_section`.
     """
@@ -162,8 +158,7 @@ def Plotting(data, model_function,theorical_X, result):
 
 
 
-# Calculate a numerical integral deviding the path of projectil into n_slice
-# Use the fitting parameters to calculate the integral
+
 def Integral(n_slice, cs_params, sp_params, config_file):
     """
     Calculate the total reaction rate by integrating over the projectile path.
@@ -179,19 +174,20 @@ def Integral(n_slice, cs_params, sp_params, config_file):
         config_file (str): Path to the configuration file containing additional parameters (e.g. atomic numbers, initial kinetic energy).
 
     Returns:
+        The distance at which the projectile stops.
         The function prints the estimated reaction rate.
     """
     config = configparser.ConfigParser()
 
-    config.read(config_file) # give the value of the parameters used to calcutate tthe integral
+    config.read(config_file) # Give the value of the parameters used to calcutate tthe integral
     ZI = float(config.get('settings','ZI')) #Atomic number
     AI = float(config.get('settings','AI')) #Mass number
-    K_i = float(config.get('settings','K_i')) #initial kinetic energy
-    Ze = float(config.get('settings','Ze')) #charge state of the accelerated ion
-    I0 = float(config.get('settings','I0')) #initial beam current
-    rhot = float(config.get('settings','rhot')) #target density
-    I=config.get('settings', 'I') #isotope
-    total_thickness=float(config.get('settings','total_thickness')) #slice thickness in mm
+    K_i = float(config.get('settings','K_i')) #Initial kinetic energy
+    Ze = float(config.get('settings','Ze')) #Charge state of the accelerated ion
+    I0 = float(config.get('settings','I0')) #Initial beam current
+    rhot = float(config.get('settings','rhot')) #Target density
+    I=config.get('settings', 'I') #Isotope
+    total_thickness=float(config.get('settings','total_thickness')) #Slice thickness in mm
     
 
     Iso=Isotope(I)
@@ -200,9 +196,9 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     HL=(Iso.half_life(Iso.optimum_units())*3600) #half life of the isotope
     decay_constant=ln(2)/(HL) 
 
-    Mp= float(config.get('costants','Mp'))  #mass of a proton
-    q_ele= float(config.get('costants','q_ele')) #charge of an electtron
-    cs= float(config.get('costants','cs')) #speed of the light
+    Mp= float(config.get('costants','Mp'))  #Mass of a proton
+    q_ele= float(config.get('costants','q_ele')) #Charge of an electtron
+    cs= float(config.get('costants','cs')) #Speed of the light
     NA= float(config.get('costants','NA')) #Avogadro number
     NT=0.01*rhot*NA*total_thickness/PA # Number of nuclei per unit area, where I multiply by 0.01 to express NT in nuclei per square millimeter (1/mm^2)
 
@@ -213,7 +209,7 @@ def Integral(n_slice, cs_params, sp_params, config_file):
 
 
     for k in range(n_slice): # This is the actual integral.
-        energy_loss = stopping_power(slice_thickness*k, **sp_params)*slice_thickness # Calculate the energy in the k-th slice
+        energy_loss = stopping_power(slice_thickness*k, **sp_params)*slice_thickness # Calculate the energy lost in the k-th slice
         cumulative_energy_loss += energy_loss # Update the cumulative energy loss
     
         k_e_slice = K_i - cumulative_energy_loss  # Calculate the kinetic energy for this slice
@@ -226,7 +222,6 @@ def Integral(n_slice, cs_params, sp_params, config_file):
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * q_ele)  # Number of particles in the beam in the k-th slice.
-                                             # I multiply by 10^6 to convert mm^2 to m^2
         rval += nptmp * NT * sgm   # Add reaction rate for this slice
 
 
