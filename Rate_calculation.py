@@ -12,7 +12,6 @@ config.read('configuration.txt')
 
 cross_section = config.get('paths', 'sezione_urto')
 stopping_power = config.get('paths', 'stopping_power')
-print ( str(functions_definition.cross_section))
 
 
 #import data on cross-sections
