@@ -50,7 +50,7 @@ def test_fitting_sp_params_positive():
 
     GIVEN: Simulated data generated from the `stopping_power` function with known parameters.
     WHEN: The `Fitting` function estimates parameters from this simulated data.
-    THEN: The estimated parameters `xc`, `A`, `sigma`, `tau`, and `C1` should all be positive or non-negative.
+    THEN: The estimated parameters `xc`, `A`, `sigma` and `tau` should all be positive or non-negative.
     """
     x_data = np.linspace(0, 10, 100)
     y_data = stopping_power(x_data, xc=5, A=150, sigma=0.5, tau=2, C1=5) 
@@ -64,6 +64,8 @@ def test_fitting_sp_params_positive():
     assert params['A'].value > 0, "Parameter 'A' should be positive"
     assert params['sigma'].value > 0, "Parameter 'sigma' should be positive"
     assert params['tau'].value > 0, "Parameter 'tau' should be positive"
+
+
 
 def test_integral_invalid_energy_loss():
     """
