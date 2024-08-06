@@ -63,5 +63,7 @@ Afterwards, a numerical integral over the thickness of the target will be perfor
 2) this is the fitting of the stopping power of protons with initial kinetic energy trought a nickel target
 ![config](./images/Stopping_power_fitting.png)
 
-The value of the estimated rate is: 34366051.66914378  s^-1
+Projectile energy is exhausted at slice 835.
+projectil stops at 4.175mm.
+The value of the estimated rate is:  6.873210333828756e+16  s^-1
 
