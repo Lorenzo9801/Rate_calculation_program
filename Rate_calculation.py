@@ -9,7 +9,6 @@ if config_file == "":
     config_file = "configuration.txt"
 
 config_dict = functions_definition.load_config(config_file)
-print("Config dict:", config_dict)  # Debug output
 
 
 cross_section = config_dict.get('sezione_urto')
@@ -20,10 +19,15 @@ stopping_power = config_dict.get('stopping_power')
 cross_section_data=np.loadtxt(os.path.expanduser(cross_section),comments='%')
 X_CS, result_CS=functions_definition.Fitting(functions_definition.cross_section, cross_section_data,A=10,sigma=1,tau=1)
 functions_definition.Plotting(cross_section_data, functions_definition.cross_section, X_CS, result_CS)
-Val_I1 = result_CS.params['xc'].value
-Val_I2 = result_CS.params['A'].value
-Val_I3 = result_CS.params['sigma'].value
-Val_I4 = result_CS.params['tau'].value
+
+
+params_cross_section = {
+    'xc': result_CS.params['xc'].value,
+    'A': result_CS.params['A'].value,
+    'sigma': result_CS.params['sigma'].value,
+    'tau': result_CS.params['tau'].value
+}
+
 
 
 #Importing data on stopping power.
@@ -36,19 +40,13 @@ Val_I7 = result_SP.params['sigma'].value
 Val_I8 = result_SP.params['tau'].value
 Val_I9 = result_SP.params['C1'].value
 
-params_cross_section = {
-    'xc': Val_I1,
-    'A': Val_I2,
-    'sigma': Val_I3,
-    'tau': Val_I4
-}
 
 params_stopping_power = {
-    'xc': Val_I5,
-    'A': Val_I6,
-    'sigma': Val_I7,
-    'tau': Val_I8,
-    'C1': Val_I9
+    'xc': result_SP.params['xc'].value,
+    'A': result_SP.params['A'].value,
+    'sigma': result_SP.params['sigma'].value,
+    'tau': result_SP.params['tau'].value,
+    'C1': result_SP.params['C1'].value
 }
 
 functions_definition.Integral(1000,params_cross_section,params_stopping_power, config_dict)
