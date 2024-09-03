@@ -9,6 +9,9 @@ I= 64CU
 total_thickness=5
 num_slice= 1000
 
+save_results= yes
+output_file = output.txt
+
 [costants]
 Mp=938.27208816
 q_ele = 1.60217662e-19
