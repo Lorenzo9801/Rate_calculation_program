@@ -34,11 +34,7 @@ params_cross_section = {
 stopping_power_data=np.loadtxt(os.path.expanduser(stopping_power),comments='%')
 X_SP,result_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data,A=150,sigma=0.5,tau=2,C1=5)
 functions_definition.Plotting(stopping_power_data, functions_definition.stopping_power, X_SP, result_SP)
-Val_I5 = result_SP.params['xc'].value
-Val_I6 = result_SP.params['A'].value
-Val_I7 = result_SP.params['sigma'].value
-Val_I8 = result_SP.params['tau'].value
-Val_I9 = result_SP.params['C1'].value
+
 
 
 params_stopping_power = {
@@ -49,4 +45,5 @@ params_stopping_power = {
     'C1': result_SP.params['C1'].value
 }
 
-functions_definition.Integral(1000,params_cross_section,params_stopping_power, config_dict)
+num_slice = int(config_dict.get('num_slice'))
+functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)

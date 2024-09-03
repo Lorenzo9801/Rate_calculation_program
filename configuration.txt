@@ -7,7 +7,7 @@ I0 = 0.001
 rhot=8.9
 I= 64CU
 total_thickness=5
-
+num_slice= 1000
 
 [costants]
 Mp=938.27208816
@@ -17,5 +17,5 @@ NA=6.0221409e23
 
 
 [paths]
-sezione_urto: data/cross section 64Ni(p,n)64Cu.txt
-stopping_power: data/stopping power 50 MeV.txt
+sezione_urto= data/cross section 64Ni(p,n)64Cu.txt
+stopping_power= data/stopping power 50 MeV.txt
