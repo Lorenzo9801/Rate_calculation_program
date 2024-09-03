@@ -47,18 +47,7 @@ params_stopping_power = {
 
 num_slice = int(config_dict.get('num_slice'))
 
-rval, projectil_path=functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)
+rval,projectil_path=functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)
 
-# Ask the user whether to print and/or save the results
-print_results = input("Do you want to print the results? (yes/no): ").strip().lower()
-save_results = input("Do you want to save the results to a file? (yes/no): ").strip().lower()
-
-if print_results == 'yes':
-    print("The value of the estimated rate is: ", rval, "s^-1")
-    print("The projectile stops at: ", projectil_path, "mm")
-
-if save_results == 'yes':
-    output_file = input("Enter the name of the file to save the results: ")
-    with open(output_file, 'w') as file:
-        file.write(f"The value of the estimated rate is: {rval} s^-1\n")
-        file.write(f"The projectile stops at: {projectil_path} mm\n")
+print("The value of the estimated rate is: ",rval," s^-1")
+print("The path of the projectil is", projectil_path, "mm.")
