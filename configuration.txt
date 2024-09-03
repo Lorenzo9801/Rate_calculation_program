@@ -10,7 +10,7 @@ total_thickness=5
 num_slice= 1000
 
 save_results= yes
-output_file = output.txt
+result_file = result.txt
 
 [costants]
 Mp=938.27208816

@@ -50,9 +50,9 @@ num_slice = int(config_dict.get('num_slice'))
 rval,projectil_path=functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)
 
 if config_dict.get('save_results').lower() == 'yes':
-    output_file = config_dict.get('output_file', 'output.txt')
-    with open(output_file, "w") as file:
+    result_file = config_dict.get('result_file', 'result.txt')
+    with open(result_file, "w") as file:
         file.write(f"The value of the estimated rate is: {rval} s^-1\n")
         file.write(f"The path of the projectile is {projectil_path} mm.\n")
 
-    print(f"Results have been saved to {output_file}.")
+    print(f"Results have been saved to {result_file}.")
