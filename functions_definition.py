@@ -243,5 +243,5 @@ def Integral(n_slice, cs_params, sp_params, settings):
         rval += nptmp * NT * sgm   # Add reaction rate for this slice
 
 
-    print("The value of the estimated rate is: ",rval," s^-1")
+
     return rval

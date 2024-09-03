@@ -46,4 +46,7 @@ params_stopping_power = {
 }
 
 num_slice = int(config_dict.get('num_slice'))
-functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)
+
+rval=functions_definition.Integral(num_slice,params_cross_section,params_stopping_power, config_dict)
+
+print("The value of the estimated rate is: ",rval," s^-1")
