@@ -106,7 +106,7 @@ def Fitting(model_function,data,**init_params):
     parameters = Parameters()
     parameters.add('xc', value=initial_xc)
     for param_name, init_value in init_params.items():
-     parameters.add(param_name, value=init_value)
+        parameters.add(param_name, value=init_value)
 
     # Determine the range of x-values for generating the theoretical curve
     min_x, max_x = X_Data.min(), X_Data.max()
@@ -232,16 +232,15 @@ def Integral(n_slice, cs_params, sp_params, settings):
     
         k_e_slice = K_i - cumulative_energy_loss  # Calculate the kinetic energy for this slice
         if k_e_slice < 0:
-            print(f"Projectile energy is exhausted at slice {k}.")
             k_e_slice = 0
             projectil_path= slice_thickness*k
-            print(f"projectil stops at {projectil_path}mm.")
             break
+
         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
         nptmp = Itmp / (Ze * q_ele)  # Number of particles in the beam in the k-th slice.
         rval += nptmp * NT * sgm   # Add reaction rate for this slice
 
 
-
-    return rval
+  
+    return rval, projectil_path
