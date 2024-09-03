@@ -11,6 +11,26 @@ from npat import Isotope
 from numpy import log as ln
 
 
+def load_config(config_file):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    config_dict = {}
+    
+    # Process 'paths' section
+    for key in config.options('paths'):
+        config_dict[key] = config.get('paths', key)
+
+    # Process 'settings' section
+    for key in config.options('settings'):
+        config_dict[key] = config.get('settings', key)
+
+    # Process 'costants' section
+    for key in config.options('costants'):
+        config_dict[key] = config.get('costants', key)
+
+    return config_dict
+
 def cross_section(x,xc,A,sigma,tau):
     """
     This function represents a convolution of a Gaussian and an exponential 
@@ -159,7 +179,7 @@ def Plotting(data, model_function,theorical_X, result):
 
 
 
-def Integral(n_slice, cs_params, sp_params, config_file):
+def Integral(n_slice, cs_params, sp_params, settings):
     """
     Calculate the total reaction rate by integrating over the projectile path.
 
@@ -177,17 +197,15 @@ def Integral(n_slice, cs_params, sp_params, config_file):
         The distance at which the projectile stops.
         The function prints the estimated reaction rate.
     """
-    config = configparser.ConfigParser()
 
-    config.read(config_file) # Give the value of the parameters used to calcutate tthe integral
-    ZI = float(config.get('settings','ZI')) #Atomic number
-    AI = float(config.get('settings','AI')) #Mass number
-    K_i = float(config.get('settings','K_i')) #Initial kinetic energy
-    Ze = float(config.get('settings','Ze')) #Charge state of the accelerated ion
-    I0 = float(config.get('settings','I0')) #Initial beam current
-    rhot = float(config.get('settings','rhot')) #Target density
-    I=config.get('settings', 'I') #Isotope
-    total_thickness=float(config.get('settings','total_thickness')) #Slice thickness in mm
+    ZI = float(settings.get('zi')) #Atomic number
+    AI = float(settings.get('ai')) #Mass number
+    K_i = float(settings.get('k_i')) #Initial kinetic energy
+    Ze = float(settings.get('ze')) #Charge state of the accelerated ion
+    I0 = float(settings.get('i0')) #Initial beam current
+    rhot = float(settings.get('rhot')) #Target density
+    I=settings.get('i') #Isotope
+    total_thickness=float(settings.get('total_thickness')) #Slice thickness in mm
     
 
     Iso=Isotope(I)
@@ -196,10 +214,10 @@ def Integral(n_slice, cs_params, sp_params, config_file):
     HL=(Iso.half_life(Iso.optimum_units())*3600) #half life of the isotope
     decay_constant=ln(2)/(HL) 
 
-    Mp= float(config.get('costants','Mp'))  #Mass of a proton
-    q_ele= float(config.get('costants','q_ele')) #Charge of an electtron
-    cs= float(config.get('costants','cs')) #Speed of the light
-    NA= float(config.get('costants','NA')) #Avogadro number
+    Mp= float(settings.get('mp'))  #Mass of a proton
+    q_ele= float(settings.get('q_ele')) #Charge of an electtron
+    cs= float(settings.get('cs')) #Speed of the light
+    NA= float(settings.get('na')) #Avogadro number
     NT=0.01*rhot*NA*total_thickness/PA # Number of nuclei per unit area, where I multiply by 0.01 to express NT in nuclei per square millimeter (1/mm^2)
 
     slice_thickness = total_thickness / n_slice

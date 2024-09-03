@@ -8,14 +8,12 @@ config_file = input("Please enter the name of the configuration file (default: c
 if config_file == "":
     config_file = "configuration.txt"
 
-config = configparser.ConfigParser()
-config.read(config_file)
+config_dict = functions_definition.load_config(config_file)
+print("Config dict:", config_dict)  # Debug output
 
 
-
-
-cross_section = config.get('paths', 'sezione_urto')
-stopping_power = config.get('paths', 'stopping_power')
+cross_section = config_dict.get('sezione_urto')
+stopping_power = config_dict.get('stopping_power')
 
 
 #import data on cross-sections
@@ -53,4 +51,4 @@ params_stopping_power = {
     'C1': Val_I9
 }
 
-functions_definition.Integral(1000,params_cross_section,params_stopping_power, "configuration.txt")
+functions_definition.Integral(1000,params_cross_section,params_stopping_power, config_dict)
