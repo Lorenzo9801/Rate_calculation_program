@@ -4,8 +4,12 @@ import os
 import configparser
 import functions_definition
 
+config_file = input("Please enter the name of the configuration file (default: configuration.txt): ")
+if config_file == "":
+    config_file = "configuration.txt"
+
 config = configparser.ConfigParser()
-config.read('configuration.txt')
+config.read(config_file)
 
 
 
