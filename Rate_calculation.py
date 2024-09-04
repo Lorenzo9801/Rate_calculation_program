@@ -3,6 +3,8 @@ import numpy as np
 import os
 import configparser
 import functions_definition
+import matplotlib.pyplot as plt
+
 
 config_file = input("Please enter the name of the configuration file (default: configuration.txt): ")
 if config_file == "":
@@ -10,16 +12,23 @@ if config_file == "":
 
 config_dict = functions_definition.load_config(config_file)
 
-
 cross_section = config_dict.get('sezione_urto')
 stopping_power = config_dict.get('stopping_power')
 
 
+show_plots = config_dict.get('show_plots')
+save_plots = config_dict.get('save_plots')
+save_results = config_dict.get('save_results')
+
 #import data on cross-sections
 cross_section_data=np.loadtxt(os.path.expanduser(cross_section),comments='%')
 X_CS, result_CS=functions_definition.Fitting(functions_definition.cross_section, cross_section_data,A=10,sigma=1,tau=1)
-functions_definition.Plotting(cross_section_data, functions_definition.cross_section, X_CS, result_CS)
 
+if show_plots == 'yes':
+    functions_definition.Plotting(cross_section_data, functions_definition.cross_section, X_CS, result_CS)
+if save_plots == 'yes':
+        plt.savefig('cross_section_plot.png')
+        print("Cross section plot has been saved as 'cross_section_plot.png'")
 
 params_cross_section = {
     'xc': result_CS.params['xc'].value,
@@ -33,8 +42,12 @@ params_cross_section = {
 #Importing data on stopping power.
 stopping_power_data=np.loadtxt(os.path.expanduser(stopping_power),comments='%')
 X_SP,result_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data,A=150,sigma=0.5,tau=2,C1=5)
-functions_definition.Plotting(stopping_power_data, functions_definition.stopping_power, X_SP, result_SP)
 
+if show_plots == 'yes':
+    functions_definition.Plotting(stopping_power_data, functions_definition.stopping_power, X_SP, result_SP)
+if save_plots == 'yes':
+    plt.savefig('stopping_power_plot.png')
+    print("Stopping power plot has been saved as 'stopping_power_plot.png'")
 
 
 params_stopping_power = {

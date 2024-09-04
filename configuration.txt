@@ -10,6 +10,8 @@ total_thickness=5
 num_slice= 1000
 
 save_results= yes
+show_plots = yes
+save_plots = yes
 result_file = result.txt
 
 [costants]
