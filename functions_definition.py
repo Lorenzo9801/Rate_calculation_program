@@ -47,7 +47,11 @@ def cross_section(x,xc,A,sigma,tau):
         float: The calculated cross-section value.
     """
     
-    y=0.5*(A/tau)*exp((0.5*(sigma/tau)**2-(x-xc)/tau))*(1+special.erf(((x-xc)/sigma-sigma/tau)/sqrt(2)))
+    exp_term = exp(0.5 * (sigma / tau) ** 2 - (x - xc) / tau)
+    gaussian_term = 1 + special.erf(((x - xc) / sigma - sigma / tau) / sqrt(2))
+    
+    y = 0.5 * (A / tau) * exp_term * gaussian_term    
+    
     return y
 
 
@@ -67,7 +71,12 @@ def stopping_power(x,xc,A,sigma,tau,C1):
     Returns:
         float: The calculated stopping power value.
     """
-    y=0.5*(A/tau)*exp(0.5*(sigma/tau)**2+(x-xc)/tau)*(1+special.erf(((xc-x)/sigma-sigma/tau)/sqrt(2)))- np.piecewise(x, [x <= xc, x > xc], [C1, 0])
+    exp_term = exp(0.5 * (sigma / tau) ** 2 + (x - xc) / tau)
+    gaussian_term = 1 + special.erf(((xc - x) / sigma - sigma / tau) / sqrt(2))
+    piecewise_term = np.piecewise(x, [x <= xc, x > xc], [C1, 0])
+
+    y = 0.5 * (A / tau) * exp_term * gaussian_term - piecewise_term
+
     return y
 
 
