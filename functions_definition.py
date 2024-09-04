@@ -129,61 +129,60 @@ def Fitting(model_function,data,num_points=10000,**init_params):
 
 
 
-def Plotting(data, model_function,theorical_X, result):
+def PlotCrossSection(data, theorical_X, result):
     """
-    Plot the experimental data and the fitted model curve.
-
-    This function generates a plot comparing the experimental data to the fitted model
-    curve. It automatically adjusts the plot based on whether the model function is for
-    stopping power or cross section.
+    Plot the experimental data and the fitted model curve for cross section. This function generates a plot comparing the experimental data to the fitted model
+    curve.
 
     Parameters:
         data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
-        model_function (function): The model function used for fitting (cross_section or stopping_power).
-        theorical_X (numpy.ndarray): The x-values for plotting the theorical model curve.
+        theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
         result: The result object of the fit, containing the fit parameters.
-    Raises:
-        ValueError: If `model_function` is not either `stopping_power` or `cross_section`.
     """
-
-
-    X_Data=data[:,0]
-    Y_Data=data[:,1]
+    X_Data = data[:,0]
+    Y_Data = data[:,1]
 
     Val_I1 = result.params['xc'].value
     Val_I2 = result.params['A'].value
     Val_I3 = result.params['sigma'].value
     Val_I4 = result.params['tau'].value
-      
-    fig1 = plt.figure(1,figsize=(10,6))
+
+    plt.figure(figsize=(10,6))
+    plt.plot(X_Data, Y_Data, 'b.')
+    plt.plot(theorical_X, cross_section(theorical_X, Val_I1, Val_I2, Val_I3, Val_I4))
+    plt.title("Cross Section")
+    plt.xlabel("Kinetic Energy (MeV)")
+    plt.ylabel("Cross Section (barn)")
+    plt.draw()
+    plt.show()
     
-    plt.plot(X_Data,Y_Data,'b.')
 
+def PlotStoppingPower(data, theorical_X, result):
+    """
+    Plot the experimental data and the fitted model curve for stopping power.
 
-    # If we are fitting the stopping power, we will need an additional parameter, C1.
-    if model_function == stopping_power:
-        Val_I5 =  result.params['C1'].value
-        plt.plot(theorical_X,model_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4, Val_I5))
-        plt.title("Stopping Power")
-        plt.xlabel("Distance (mm)")
-        plt.ylabel("<dE/dx> (Mev/mm)")
-        plt.draw()
-        plt.show()  
+    Parameters:
+        data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
+        theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
+        result: The result object of the fit, containing the fit parameters.
+    """
+    X_Data = data[:,0]
+    Y_Data = data[:,1]
 
+    Val_I1 = result.params['xc'].value
+    Val_I2 = result.params['A'].value
+    Val_I3 = result.params['sigma'].value
+    Val_I4 = result.params['tau'].value
+    Val_I5 = result.params['C1'].value
 
-    elif model_function == cross_section: 
-        plt.plot(theorical_X,model_function(theorical_X,Val_I1,Val_I2,Val_I3,Val_I4))
-        plt.title("Cross section")
-        plt.xlabel("Kinetic Energy (MeV)")
-        plt.ylabel("Cross Sectio (barn)")
-        plt.draw()
-        plt.show()  
-
-
-    else:
-        raise ValueError("model_function must be either 'stopping_power' or 'cross_section'")
-
-
+    plt.figure(figsize=(10,6))
+    plt.plot(X_Data, Y_Data, 'b.')
+    plt.plot(theorical_X, stopping_power(theorical_X, Val_I1, Val_I2, Val_I3, Val_I4, Val_I5))
+    plt.title("Stopping Power")
+    plt.xlabel("Distance (mm)")
+    plt.ylabel("<dE/dx> (Mev/mm)")
+    plt.draw()
+    plt.show()
 
 
 
