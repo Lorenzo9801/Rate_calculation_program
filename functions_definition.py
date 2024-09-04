@@ -51,7 +51,7 @@ def cross_section(x,xc,A,sigma,tau):
     gaussian_term = 1 + special.erf(((x - xc) / sigma - sigma / tau) / sqrt(2))
     
     y = 0.5 * (A / tau) * exp_term * gaussian_term    
-    
+
     return y
 
 
@@ -80,7 +80,7 @@ def stopping_power(x,xc,A,sigma,tau,C1):
     return y
 
 
-def Fitting(model_function,data,**init_params):
+def Fitting(model_function,data,num_points=10000,**init_params):
     """
     Fit a model to experimental data.
 
@@ -120,7 +120,7 @@ def Fitting(model_function,data,**init_params):
     # Determine the range of x-values for generating the theoretical curve
     min_x, max_x = X_Data.min(), X_Data.max()
     # Generate x-values over the range [min_x, max_x] with a high resolution for plotting
-    theorical_x = np.arange(min_x, max_x, (max_x - min_x) / 10000)
+    theorical_x = np.arange(min_x, max_x, (max_x - min_x) / num_points)
     # Fit the model to the data using the specified parameters
     result=model.fit(Y_Data,params=parameters,x=X_Data)
 
