@@ -11,7 +11,7 @@ from npat import Isotope
 from numpy import log as ln
 
 
-def load_config(config_file):
+def load_config(config_file="configuration.txt"):
     """
     Load configuration data from a text file and return it as a dictionary.
 

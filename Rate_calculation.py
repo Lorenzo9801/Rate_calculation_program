@@ -6,11 +6,7 @@ import functions_definition
 import matplotlib.pyplot as plt
 
 
-config_file = input("Please enter the name of the configuration file (default: configuration.txt): ")
-if config_file == "":
-    config_file = "configuration.txt"
-
-config_dict = functions_definition.load_config(config_file)
+config_dict = functions_definition.load_config()
 
 cross_section = config_dict.get('sezione_urto')
 stopping_power = config_dict.get('stopping_power')
