@@ -12,6 +12,18 @@ from numpy import log as ln
 
 
 def load_config(config_file):
+    """
+    Load configuration data from a text file and return it as a dictionary.
+
+    The configuration file is divided into sections (e.g., 'paths', 'settings', 'constants'),
+    and each section contains key-value pairs (e.g., 'ZI = 29').
+
+    Parameters:
+        config_file (str): Path to the configuration file.
+
+    Returns:
+        dict: Dictionary with all the configuration settings, grouped by section.
+    """
     config = configparser.ConfigParser()
     config.read(config_file)
 
