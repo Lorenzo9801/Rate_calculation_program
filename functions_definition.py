@@ -141,7 +141,7 @@ def Fitting(model_function,data,num_points=10000,**init_params):
 
 
 
-def PlotCrossSection(data, theorical_X, result):
+def PlotCrossSection(data, theorical_X, result, show_plot=True, save_plot=True, filename='cross_section_plot.png'):
     """
     Plot the experimental data and the fitted model curve for cross section. This function generates a plot comparing the experimental data to the fitted model
     curve.
@@ -165,11 +165,20 @@ def PlotCrossSection(data, theorical_X, result):
     plt.title("Cross Section")
     plt.xlabel("Kinetic Energy (MeV)")
     plt.ylabel("Cross Section (barn)")
-    plt.draw()
-    plt.show()
+
+    if save_plot:
+        plt.savefig(filename)
+        print(f"Cross section plot has been saved as '{filename}'")
+  
+    if show_plot:
+        plt.show() 
+    
+    plt.close()  
+
+
     
 
-def PlotStoppingPower(data, theorical_X, result):
+def PlotStoppingPower(data, theorical_X, result, show_plot=True, save_plot=True, filename='stopping_power_plot.png'):
     """
     Plot the experimental data and the fitted model curve for stopping power.
 
@@ -193,8 +202,16 @@ def PlotStoppingPower(data, theorical_X, result):
     plt.title("Stopping Power")
     plt.xlabel("Distance (mm)")
     plt.ylabel("<dE/dx> (Mev/mm)")
-    plt.draw()
-    plt.show()
+
+    if save_plot:
+        plt.savefig(filename)
+        print(f"Stopping power plot has been saved as '{filename}'")
+  
+    if show_plot:
+        plt.show() 
+    
+    plt.close()  
+
 
 
 

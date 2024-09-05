@@ -24,12 +24,8 @@ save_results = config_dict.get('save_results')
 cross_section_data=np.loadtxt(os.path.expanduser(cross_section),comments='%')
 X_CS, result_CS=functions_definition.Fitting(functions_definition.cross_section, cross_section_data,A=10,sigma=1,tau=1)
 
-if show_plots == 'yes':
-    functions_definition.PlotCrossSection(cross_section_data, X_CS, result_CS)
-if save_plots == 'yes':
-    plt.savefig('cross_section_plot.png')
-    print("Cross section plot has been saved as 'cross_section_plot.png'")
-    plt.close()
+functions_definition.PlotCrossSection(cross_section_data, X_CS, result_CS, show_plot=show_plots, save_plot=save_plots, filename='cross_section_plot.png')
+
 
 params_cross_section = {
     'xc': result_CS.params['xc'].value,
@@ -44,12 +40,8 @@ params_cross_section = {
 stopping_power_data=np.loadtxt(os.path.expanduser(stopping_power),comments='%')
 X_SP,result_SP=functions_definition.Fitting(functions_definition.stopping_power, stopping_power_data,A=150,sigma=0.5,tau=2,C1=5)
 
-if show_plots == 'yes':
-    functions_definition.PlotStoppingPower(stopping_power_data, X_SP, result_SP)
-if save_plots == 'yes':
-    plt.savefig('stopping_power_plot.png')
-    print("Stopping power plot has been saved as 'stopping_power_plot.png'")
-    plt.close()
+functions_definition.PlotStoppingPower(stopping_power_data, X_SP, result_SP, show_plot=show_plots, save_plot=save_plots, filename='stopping_power_plot.png')
+
 
 params_stopping_power = {
     'xc': result_SP.params['xc'].value,
