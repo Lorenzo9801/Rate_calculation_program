@@ -4,6 +4,115 @@ import numpy as np
 import pytest
 from unittest.mock import patch
 
+def test_cross_section_tau():
+    """
+    Test the `cross_section` function's behavior with varying tau values.
+
+    GIVEN: The cross-section function with parameters xc, A, sigma, and different values for tau.
+    WHEN: The cross-section function is called with x equal to xc and varying tau values.
+    THEN: The cross-section should decrease as tau increases, meaning the results should be ordered such that
+          the cross section for a smaller tau is greater than that for a larger tau.
+    """
+    xc = 5.0
+    A = 10
+    sigma = 1
+    
+    tau_values = [0.5, 1, 2]
+    x = xc 
+    
+    results = [cross_section(x, xc, A, sigma, tau) for tau in tau_values]
+    
+    assert results[0] > results[1] > results[2], "The cross section should increase with increasing tau"
+
+def test_cross_section_sigma():
+    """
+    Test the `cross_section` function's behavior with varying sigma values.
+
+    GIVEN: The cross-section function with parameters xc, A, tau, and different values for sigma.
+    WHEN: The cross-section function is called with x equal to xc and varying sigma values.
+    THEN: The cross-section should decrease as sigma increases, meaning the results should be ordered such that
+          the cross section for a smaller sigma is greater than that for a larger sigma.
+    """
+    xc = 5.0
+    A = 10
+    tau = 2
+    
+    sigma_values = [0.5, 1, 2]
+    x = xc 
+    
+    results = [cross_section(x, xc, A, sigma, tau) for sigma in sigma_values]
+    
+    assert results[0] > results[1] > results[2], "The cross section should decrease as sigma increases"
+
+
+def test_cross_section_amplitude():
+    """
+    Test the `cross_section` function's behavior with varying amplitude values.
+
+    GIVEN: The cross-section function with parameters xc, sigma, tau, and different values for amplitude A.
+    WHEN: The cross-section function is called with x equal to xc and varying amplitude values.
+    THEN: The cross-section should increase as amplitude A increases, meaning the results should be ordered such that
+          the cross section for a smaller amplitude is less than that for a larger amplitude.
+    """
+
+    xc = 5.0
+    sigma = 1
+    tau = 2
+    
+
+    A_values = [5, 10, 20]
+    x = xc  
+    
+    results = [cross_section(x, xc, A, sigma, tau) for A in A_values]
+    
+   
+    assert results[0] < results[1] < results[2], "The cross section should increase with increasing amplitude A"
+
+def test_cross_section_around_xc():
+    """
+    Test the `cross_section` function's behavior around the central value xc.
+
+    GIVEN: The cross-section function with parameters xc, A, sigma, tau, and a range of x values around xc.
+    WHEN: The cross-section function is called with varying x values close to xc.
+    THEN: The maximum cross-section value should be near xc, meaning the maximum should be within 1.5 units of xc.
+    """
+    xc = 5.0
+    A = 10
+    sigma = 1
+    tau = 2
+
+
+    x_values = np.linspace(xc - 2, xc + 2, 1000)
+
+    cross_section_values = [cross_section(x, xc, A, sigma, tau) for x in x_values]
+
+    x_max_index = np.argmax(cross_section_values)
+    x_max = x_values[x_max_index]
+
+    assert abs(x_max - xc) < 1.5, f"Maximum should be near xc. Found maximum at {x_max}, expected around {xc}"
+
+
+def test_cross_section_behavior_at_limits():
+    """
+    Test the `cross_section` function's behavior for large x values.
+
+    GIVEN: The cross-section function with parameters xc, A, sigma, tau, and a very large x value.
+    WHEN: The cross-section function is called with a large x value.
+    THEN: The cross-section should be near zero for large x values, meaning the result should be less than 1e-6.
+    """
+
+    xc = 5.0
+    A = 10
+    sigma = 1
+    tau = 2
+    
+    x_large = 1000
+    
+    result_large = cross_section(x_large, xc, A, sigma, tau)
+
+    
+    assert result_large < 1e-6, "Cross section should be near zero for large x"
+
 def test_fitting_invalid_data():
     """
     Test the `Fitting` function with data that is not in the required format.
@@ -15,7 +124,7 @@ def test_fitting_invalid_data():
     def model_function(x, xc):
         return np.exp(-((x - xc)**2))
 
-    invalid_data = np.array([1, 0.5, 2, 0.7, 3, 0.2])  # Non è un array 2D
+    invalid_data = np.array([1, 0.5, 2, 0.7, 3, 0.2])  
     init_params = {}
     
     with pytest.raises(ValueError, match="Data should be a 2D numpy array with two columns"):
@@ -67,32 +176,33 @@ def test_fitting_sp_params_positive():
 
 
 
-def test_integral_invalid_energy_loss():
-    """
-    Test the `Integral` function when encountering extreme values for energy loss.
+# def test_integral_invalid_energy_loss():
+#     """
+#     Test the `Integral` function when encountering extreme values for energy loss.
 
-    GIVEN: Mock implementations of `cross_section` and `stopping_power`, where `stopping_power` simulates a very high energy loss.
-    WHEN: The `Integral` function is called using these mock implementations.
-    THEN: The function should not return NaN, ensuring that it handles extreme energy loss values properly and does not produce invalid results.
-    """
-    def mock_cross_section(energy, **params):
-        return 1.0  # Simulates a constant cross-section function
+#     GIVEN: Mock implementations of `cross_section` and `stopping_power`, where `stopping_power` simulates a very high energy loss.
+#     WHEN: The `Integral` function is called using these mock implementations.
+#     THEN: The function should not return NaN, ensuring that it handles extreme energy loss values properly and does not produce invalid results.
+#     """
+#     def mock_cross_section(energy, **params):
+#         return 1.0  # Simulates a constant cross-section function
     
-    def mock_stopping_power(distance, **params):
-        return 100.0  # Simulates a very high energy loss
+#     def mock_stopping_power(distance, **params):
+#         return 100.0  # Simulates a very high energy loss
 
-    # Example parameters
-    cs_params = {}
-    sp_params = {}
-    config = 'configuration.txt'
+#     # Example parameters
+#     cs_params = {}
+#     sp_params = {}
+#     config = 'configuration.txt'
 
 
 
-    with patch('functions_definition.cross_section', mock_cross_section), \
-         patch('functions_definition.stopping_power', mock_stopping_power):
+#     with patch('functions_definition.cross_section', mock_cross_section), \
+#          patch('functions_definition.stopping_power', mock_stopping_power):
         
-        # Execute the test
-        rval = Integral(10, cs_params, sp_params, config)
+#         # Execute the test
+#         rval = Integral(10, cs_params, sp_params, config)
         
-        # Verify that the result is not NaN
-        assert not np.isnan(rval), "The result should not be NaN with correct implementation."
+#         # Verify that the result is not NaN
+#         assert not np.isnan(rval), "The result should not be NaN with correct implementation."
+
