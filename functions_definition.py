@@ -144,12 +144,16 @@ def Fitting(model_function,data,num_points=10000,**init_params):
 def PlotCrossSection(data, theorical_X, result, show_plot=True, save_plot=True, filename='cross_section_plot.png'):
     """
     Plot the experimental data and the fitted model curve for cross section. This function generates a plot comparing the experimental data to the fitted model
-    curve.
+    curve.  The plot can be displayed and/or saved to a file.
 
     Parameters:
         data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
         theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
         result: The result object of the fit, containing the fit parameters.
+        show_plot (bool, optional): Whether to display the plot. Defaults to True.
+        save_plot (bool, optional): Whether to save the plot as an image file. Defaults to True.
+        filename (str, optional): The name of the file to save the plot if `save_plot` is True. Defaults to 'cross_section_plot.png'.
+
     """
     X_Data = data[:,0]
     Y_Data = data[:,1]
@@ -180,12 +184,18 @@ def PlotCrossSection(data, theorical_X, result, show_plot=True, save_plot=True, 
 
 def PlotStoppingPower(data, theorical_X, result, show_plot=True, save_plot=True, filename='stopping_power_plot.png'):
     """
-    Plot the experimental data and the fitted model curve for stopping power.
+    Plot the experimental data and the fitted model curve for stopping power. This function generates a plot comparing the experimental data to the fitted model
+    curve. The plot can be displayed and/or saved to a file.
 
     Parameters:
         data (numpy.ndarray): The experimental data, with the first column as the x-values and the second column as the y-values.
         theorical_X (numpy.ndarray): The x-values for plotting the theoretical model curve.
         result: The result object of the fit, containing the fit parameters.
+        show_plot (bool, optional): Whether to display the plot. Defaults to True.
+        save_plot (bool, optional): Whether to save the plot as an image file. Defaults to True.
+        filename (str, optional): The name of the file to save the plot if `save_plot` is True. Defaults to 'stopping_power_plot.png'.
+
+    Returns:
     """
     X_Data = data[:,0]
     Y_Data = data[:,1]
@@ -228,7 +238,7 @@ def Integral(n_slice, cs_params, sp_params, settings):
         n_slice (int): Number of slices to divide the projectile path into.
         cs_params (dict): Dictionary of parameters for the cross-section model function.
         sp_params (dict): Dictionary of parameters for the stopping power model function.
-        config_file (str): Path to the configuration file containing additional parameters (e.g. atomic numbers, initial kinetic energy).
+        settings (dict): Dictionary of additional parameters required for the calculation.
 
     Returns:
         The distance at which the projectile stops.
