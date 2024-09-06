@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 from unittest.mock import patch
 
+# cross_section function tests
+
 def test_cross_section_tau():
     """
     Test the `cross_section` function's behavior with varying tau values.
@@ -112,6 +114,71 @@ def test_cross_section_behavior_at_limits():
 
     
     assert result_large < 1e-6, "Cross section should be near zero for large x"
+
+
+# stopping_power function tests
+
+
+def test_stopping_power_at_infinity():
+    """
+    Test that the stopping power approaches 0 as x becomes very large.
+    
+    GIVEN: A large value of x and known parameters xc, A, sigma, tau, and C1.
+    WHEN: The stopping power is calculated for this large x-value.
+    THEN: The function should approach 0 for large x.
+    """
+    x=1000
+    xc = 5.0
+    A = 10
+    sigma = 1
+    tau = 2
+    C1 = 0.5
+    
+    result = stopping_power(x, xc, A, sigma, tau, C1)
+    
+    assert result < 1e-6, f"Stopping power at x=1000 should be near zero, got {result}"
+
+def test_stopping_power_with_different_A():
+    """
+    Test the effect of changing A on the stopping power.
+    
+    GIVEN: Different values of A and fixed values for xc, sigma, tau, and C1.
+    WHEN: The stopping power is calculated for x close to xc.
+    THEN: The stopping power should increase as A increases.
+    """
+    xc = 5.0
+    sigma = 1
+    tau = 2
+    C1 = 0.5
+    
+    A_values = [5, 10, 20]
+    x = xc
+    
+    results = [stopping_power(x, xc, A, sigma, tau, C1) for A in A_values]
+    
+    assert results[0] < results[1] < results[2], f"Stopping power should increase with A, got {results}"
+
+def test_stopping_power_with_different_sigma():
+    """
+    Test the effect of changing sigma on the stopping power.
+    
+    GIVEN: Different values of sigma and fixed values for xc, A, tau, and C1.
+    WHEN: The stopping power is calculated for x close to xc.
+    THEN: The stopping power should decrease as sigma increases, as a larger sigma broadens the Gaussian function.
+    """
+    xc = 5.0
+    A = 10
+    tau = 2
+    C1 = 0.5
+    
+    sigma_values = [0.5, 1, 2]  # Smaller sigma -> narrower Gaussian; larger sigma -> broader Gaussian
+    x = xc
+    
+    results = [stopping_power(x, xc, A, sigma, tau, C1) for sigma in sigma_values]
+    
+    # Check that the stopping power decreases with increasing sigma
+    assert results[0] > results[1] > results[2], f"Stopping power should decrease with increasing sigma, got {results}"
+
 
 def test_fitting_invalid_data():
     """
