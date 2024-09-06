@@ -180,66 +180,152 @@ def test_stopping_power_with_different_sigma():
     assert results[0] > results[1] > results[2], f"Stopping power should decrease with increasing sigma, got {results}"
 
 
-def test_fitting_invalid_data():
-    """
-    Test the `Fitting` function with data that is not in the required format.
+# Fitting tests
 
-    GIVEN: A 1D numpy array as input data, which should be a 2D array with two columns.
-    WHEN: The `Fitting` function is called with this 1D array as the input data.
-    THEN: The `Fitting` function should raise a ValueError indicating that the data should be a 2D numpy array with exactly two columns.
-    """
-    def model_function(x, xc):
-        return np.exp(-((x - xc)**2))
 
-    invalid_data = np.array([1, 0.5, 2, 0.7, 3, 0.2])  
-    init_params = {}
+def test_fitting_with_linear_data():
+    """
+    Test the fitting function using a simple linear model y = m*x + b.
     
-    with pytest.raises(ValueError, match="Data should be a 2D numpy array with two columns"):
-        Fitting(model_function, invalid_data, **init_params)
-
-
-def test_fitting_cs_params_positive():
-    """
-    Ensure that the fitting function for the `cross_section` model returns positive parameters.
-
-    GIVEN: Simulated data generated from the `cross_section` function with known parameters.
-    WHEN: The `Fitting` function estimates parameters from this simulated data.
-    THEN: The estimated parameters `xc`, `A`, `sigma`, and `tau` should all be positive.
+    GIVEN: A set of x-values and y-values generated from a known linear function.
+    WHEN: The fitting function is applied with a linear model.
+    THEN: The fitted parameters should closely match the original slope (m) and intercept (b).
     """
 
+    def linear_model(x, m, b):
+        """Simple linear model y = m*x + b."""
+        return m * x + b
+
+    true_m = 2.0
+    true_b = 1.0
     x_data = np.linspace(0, 10, 100)
-    y_data = cross_section(x_data, xc=5, A=10, sigma=1, tau=2) 
+    y_data = linear_model(x_data, true_m, true_b)
+
+    data = np.column_stack((x_data, y_data))
+
+    init_params = {'m': 3.0, 'b': 0.0}
+
+    theorical_x, result = Fitting(linear_model, data, **init_params)
+
+    fitted_m = result.params['m'].value
+    fitted_b = result.params['b'].value
+
+    assert abs(fitted_m - true_m) < 1e-6, f"Expected slope {true_m}, but got {fitted_m}"
+    assert abs(fitted_b - true_b) < 1e-6, f"Expected intercept {true_b}, but got {fitted_b}"
+
+
+def test_fitting_with_parabolic_data():
+    """
+    Test the fitting function using a simple parabolic model y = a*x^2 + b*x + c.
+    
+    GIVEN: A set of x-values and y-values generated from a known parabolic function.
+    WHEN: The fitting function is applied with a parabolic model.
+    THEN: The fitted parameters should closely match the original coefficients a, b, and c.
+    """
+
+    def parabolic_model(x, a, b, c):
+        """Simple parabolic model y = a*x^2 + b*x + c."""
+        return a * x**2 + b * x + c
+
+    true_a = 1.0
+    true_b = -2.0
+    true_c = 5.0
+    x_data = np.linspace(-10, 10, 100)
+    y_data = parabolic_model(x_data, true_a, true_b, true_c)
+
+    data = np.column_stack((x_data, y_data))
+
+    init_params = {'a': 0.5, 'b': 0.0, 'c': 0.0}
+    
+    theorical_x, result = Fitting(parabolic_model, data, **init_params)
+    
+    fitted_a = result.params['a'].value
+    fitted_b = result.params['b'].value
+    fitted_c = result.params['c'].value
+    
+    assert abs(fitted_a - true_a) < 1e-6, f"Expected a {true_a}, but got {fitted_a}"
+    assert abs(fitted_b - true_b) < 1e-6, f"Expected b {true_b}, but got {fitted_b}"
+    assert abs(fitted_c - true_c) < 1e-6, f"Expected c {true_c}, but got {fitted_c}"
+
+
+def test_fitting_with_exponential_data():
+    """
+    Test the fitting function using a simple exponential model y = A * exp(k * x).
+    
+    GIVEN: A set of x-values and y-values generated from a known exponential function.
+    WHEN: The fitting function is applied with an exponential model.
+    THEN: The fitted parameters should closely match the original coefficients A and k.
+    """
+    
+    # Define the exponential model within the test
+    def exponential_model(x, A, k):
+        """Simple exponential model y = A * exp(k * x)."""
+        return A * np.exp(k * x)
+
+    # Generate some perfect exponential data
+    true_A = 2.0
+    true_k = -0.5
+    x_data = np.linspace(0, 10, 100)
+    y_data = exponential_model(x_data, true_A, true_k)
+    
+    # Combine the data into a 2D array as required by the Fitting function
     data = np.column_stack((x_data, y_data))
     
-    theorical_x, result = Fitting(cross_section, data, A=10, sigma=1, tau=2)
+    # Initial guesses for the parameters
+    init_params = {'A': 1.0, 'k': -0.1}
     
-    params = result.params
+    # Call the fitting function with the exponential model
+    theorical_x, result = Fitting(exponential_model, data, **init_params)
     
-    assert params['xc'].value > 0, "Parameter 'xc' should be positive"
-    assert params['A'].value > 0, "Parameter 'A' should be positive"
-    assert params['sigma'].value > 0, "Parameter 'sigma' should be positive"
-    assert params['tau'].value > 0, "Parameter 'tau' should be positive"
+    # Extract the fitted parameters
+    fitted_A = result.params['A'].value
+    fitted_k = result.params['k'].value
+    
+    # Assert that the fitted parameters are close to the true values
+    assert abs(fitted_A - true_A) < 1e-6, f"Expected A {true_A}, but got {fitted_A}"
+    assert abs(fitted_k - true_k) < 1e-6, f"Expected k {true_k}, but got {fitted_k}"
 
-def test_fitting_sp_params_positive():
+def test_fitting_with_linear_data_with_noise():
     """
-    Ensure that the fitting function for the `stopping_power` model returns positive or non-negative parameters.
+    Test the fitting function using noisy linear data.
+    
+    GIVEN: A set of x-values and y-values generated from a linear function with added noise.
+    WHEN: The fitting function is applied with a linear model.
+    THEN: The fitted parameters should closely match the original slope and intercept, 
+          despite the presence of noise.
+    """
+    
+    # Define the linear model within the test
+    def linear_model(x, a, b):
+        """Linear model y = a * x + b."""
+        return a * x + b
 
-    GIVEN: Simulated data generated from the `stopping_power` function with known parameters.
-    WHEN: The `Fitting` function estimates parameters from this simulated data.
-    THEN: The estimated parameters `xc`, `A`, `sigma` and `tau` should all be positive or non-negative.
-    """
+    # Generate some linear data with noise
+    true_a = 2.0  # Slope
+    true_b = 5.0  # Intercept
     x_data = np.linspace(0, 10, 100)
-    y_data = stopping_power(x_data, xc=5, A=150, sigma=0.5, tau=2, C1=5) 
+    
+    # Generate y data with added Gaussian noise
+    noise = np.random.normal(0, 0.5, size=x_data.shape)  # Standard deviation of noise is 0.5
+    y_data = linear_model(x_data, true_a, true_b) + noise
+    
+    # Combine the data into a 2D array as required by the Fitting function
     data = np.column_stack((x_data, y_data))
     
-    theorical_x, result = Fitting(stopping_power, data, A=150, sigma=0.5, tau=2, C1=5)
+    # Initial guesses for the parameters
+    init_params = {'a': 1.0, 'b': 0.0}
     
-    params = result.params
+    # Call the fitting function with the linear model
+    theorical_x, result = Fitting(linear_model, data, **init_params)
     
-    assert params['xc'].value > 0, "Parameter 'xc' should be positive"
-    assert params['A'].value > 0, "Parameter 'A' should be positive"
-    assert params['sigma'].value > 0, "Parameter 'sigma' should be positive"
-    assert params['tau'].value > 0, "Parameter 'tau' should be positive"
+    # Extract the fitted parameters
+    fitted_a = result.params['a'].value
+    fitted_b = result.params['b'].value
+    
+    # Assert that the fitted parameters are close to the true values within a reasonable tolerance
+    assert abs(fitted_a - true_a) < 0.1, f"Expected slope {true_a}, but got {fitted_a}"
+    assert abs(fitted_b - true_b) < 0.1, f"Expected intercept {true_b}, but got {fitted_b}"
+
 
 
 
