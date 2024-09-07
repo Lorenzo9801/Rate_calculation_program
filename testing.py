@@ -1,5 +1,5 @@
 
-from functions_definition import cross_section, stopping_power, Fitting, Integral, calculate_initial_parameters
+from functions_definition import cross_section, stopping_power, Fitting, Integral, calculate_initial_parameters, calculate_slice_params
 import numpy as np
 import pytest
 from unittest.mock import patch
@@ -329,4 +329,39 @@ def test_calculate_initial_parameters():
 
     print("Test passed.")
 
+
+def test_calculate_slice_params():
+    """
+    Test the calculate_slice_params function with known parameters and expected results.
+    """
+    # Parametri di input
+    k_e_slice = 5000  
+    cs_params = {'parameter1': 1, 'parameter2': 2} 
+    sp_params = {'parameter1': 3, 'parameter2': 0.5}  
+    K_i = 100
+    I0 = 20
+    Ze = 3  
+    q_ele = 7
+
+    mock_cross_section = 1.0e-02 
+    mock_stopping_power = 2.0e-03
+
+    expected_sigma = 10**(-24)
+    expected_beam_current = 6.7353198
+    expected_energy_loss = 2.0*10**(-3)
+    with patch('functions_definition.cross_section', return_value=mock_cross_section), \
+         patch('functions_definition.stopping_power', return_value=mock_stopping_power):
+        
+
+        sigma, beam_current, energy_loss = calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele)
+
+   
+
+
+    
+        assert abs(sigma - expected_sigma) < 1e-3, f"Expected sigma: {expected_sigma}, but got {sigma}"
+        assert abs(beam_current - expected_beam_current) < 1e-3, f"Expected beam_current: {expected_beam_current}, but got {beam_current}"
+        assert abs(energy_loss - expected_energy_loss) < 1e-3, f"Expected energy_loss: {expected_energy_loss}, but got {energy_loss}"
+    
+    print('test passed')
 
