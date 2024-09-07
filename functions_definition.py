@@ -226,12 +226,188 @@ def PlotStoppingPower(data, theorical_X, result, show_plot=True, save_plot=True,
 
 
 
+# def Integral(n_slice, cs_params, sp_params, settings):
+#     """
+#     Calculate the total reaction rate by integrating over the projectile path.
+
+#     This function divides the projectile path into a specified number of slices, calculates
+#     the kinetic energy, cross-section, and stopping power for each slice, and integrates
+#     the reaction rate over the entire path.
+
+#     Parameters:
+#         n_slice (int): Number of slices to divide the projectile path into.
+#         cs_params (dict): Dictionary of parameters for the cross-section model function.
+#         sp_params (dict): Dictionary of parameters for the stopping power model function.
+#         settings (dict): Dictionary of additional parameters required for the calculation.
+
+#     Returns:
+#         The distance at which the projectile stops.
+#         The function prints the estimated reaction rate.
+#     """
+
+#     ZI = float(settings.get('zi')) #Atomic number
+#     AI = float(settings.get('ai')) #Mass number
+#     K_i = float(settings.get('k_i')) #Initial kinetic energy
+#     Ze = float(settings.get('ze')) #Charge state of the accelerated ion
+#     I0 = float(settings.get('i0')) #Initial beam current
+#     rhot = float(settings.get('rhot')) #Target density
+#     I=settings.get('i') #Isotope
+#     total_thickness=float(settings.get('total_thickness')) #Slice thickness in mm
+    
+
+#     Iso=Isotope(I)
+#     PA=Iso.mass 
+#     #You multiply by 3600 because the library provides the half-life in hours and we need it in seconds
+#     HL=(Iso.half_life(Iso.optimum_units())*3600) #half life of the isotope
+#     decay_constant=ln(2)/(HL) 
+
+#     Mp= float(settings.get('mp'))  #Mass of a proton
+#     q_ele= float(settings.get('q_ele')) #Charge of an electtron
+#     cs= float(settings.get('cs')) #Speed of the light
+#     NA= float(settings.get('na')) #Avogadro number
+#     NT=0.01*rhot*NA*total_thickness/PA # Number of nuclei per unit area, where I multiply by 0.01 to express NT in nuclei per square millimeter (1/mm^2)
+
+#     slice_thickness = total_thickness / n_slice
+
+#     cumulative_energy_loss = 0
+#     rval = 0
+
+
+#     for k in range(n_slice): # This is the actual integral.
+#         energy_loss = stopping_power(slice_thickness*k, **sp_params)*slice_thickness # Calculate the energy lost in the k-th slice
+#         cumulative_energy_loss += energy_loss # Update the cumulative energy loss
+    
+#         k_e_slice = K_i - cumulative_energy_loss  # Calculate the kinetic energy for this slice
+#         if k_e_slice < 0:
+#             k_e_slice = 0
+#             projectil_path= slice_thickness*k
+#             break
+
+#         sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
+#         Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
+#         nptmp = Itmp / (Ze * q_ele)  # Number of particles in the beam in the k-th slice.
+#         rval += nptmp * NT * sgm   # Add reaction rate for this slice
+
+
+  
+#     return rval, projectil_path
+
+def calculate_initial_parameters(settings):
+    """
+    Calculate and return the initial parameters needed for integration.
+
+    Parameters:
+        settings (dict): Dictionary of required parameters.
+
+    Returns:
+        dict: A dictionary containing the calculated parameters.
+    """
+    ZI = float(settings.get('zi'))
+    AI = float(settings.get('ai'))
+    K_i = float(settings.get('k_i'))
+    Ze = float(settings.get('ze'))
+    I0 = float(settings.get('i0'))
+    rhot = float(settings.get('rhot'))
+    I = settings.get('i')
+    total_thickness = float(settings.get('total_thickness'))
+    Mp = float(settings.get('mp'))
+    q_ele = float(settings.get('q_ele'))
+    cs = float(settings.get('cs'))
+    NA = float(settings.get('na'))
+
+    Iso = Isotope(I)
+    PA = Iso.mass
+    HL = Iso.half_life(Iso.optimum_units()) * 3600  # Half-life in seconds
+    decay_constant = np.log(2) / HL  # Decay constant
+
+    NT = 0.01 * rhot * NA * total_thickness / PA  # Number of nuclei per unit area (1/mm^2)
+    
+    return ZI, AI, K_i, Ze, I0, rhot, total_thickness, q_ele, Mp, cs, NT
+
+def calculate_energy_loss(slice_thickness, k, cumulative_energy_loss, sp_params):
+    """
+    Calculate the cumulative energy loss in the k-th slice.
+
+    Parameters:
+        slice_thickness (float): Thickness of the slice.
+        k (int): Current slice index.
+        cumulative_energy_loss (float): The cumulative energy loss so far.
+        sp_params (dict): Parameters for the stopping power model.
+
+    Returns:
+        float: Updated cumulative energy loss after the current slice.
+    """
+    energy_loss = stopping_power(slice_thickness * k, **sp_params) * slice_thickness
+    return cumulative_energy_loss + energy_loss
+
+def calculate_cross_section(k_e_slice, cs_params):
+    """
+    Calculate the cross-section for the given kinetic energy slice.
+
+    Parameters:
+        k_e_slice (float): Kinetic energy in the current slice.
+        cs_params (dict): Parameters for the cross-section model.
+
+    Returns:
+        float: Cross-section in mm².
+    """
+    return cross_section(k_e_slice, **cs_params) * 10**(-22)
+
+
+def calculate_beam_current(k_e_slice, K_i, I0, Ze, q_ele):
+    """
+    Calculate the beam current and number of particles for a given kinetic energy slice.
+
+    Parameters:
+        k_e_slice (float): Kinetic energy in the current slice.
+        K_i (float): Initial kinetic energy.
+        I0 (float): Initial beam current.
+        Ze (float): Charge state of the ion.
+        q_ele (float): Charge of an electron.
+
+    Returns:
+        float: The number of particles in the beam for this slice.
+    """
+    Itmp = I0 * np.sqrt(k_e_slice / K_i)
+    return Itmp / (Ze * q_ele)
+
+def integrate_slice(slice_thickness, k, cumulative_energy_loss, cs_params, sp_params, K_i, I0, Ze, q_ele, NT):
+    """
+    Integrate over a single slice of the projectile path.
+
+    Parameters:
+        slice_thickness (float): Thickness of the slice.
+        k (int): Current slice index.
+        cumulative_energy_loss (float): The cumulative energy loss so far.
+        cs_params (dict): Parameters for the cross-section model.
+        sp_params (dict): Parameters for the stopping power model.
+        K_i (float): Initial kinetic energy.
+        I0 (float): Initial beam current.
+        Ze (float): Charge state of the ion.
+        q_ele (float): Charge of an electron.
+        NT (float): Number of nuclei per unit area (1/mm²).
+
+    Returns:
+        tuple: Reaction rate contribution for this slice and the updated cumulative energy loss.
+    """
+    cumulative_energy_loss = calculate_energy_loss(slice_thickness, k, cumulative_energy_loss, sp_params)
+    k_e_slice = K_i - cumulative_energy_loss
+    if k_e_slice < 0:
+        k_e_slice = 0
+        return 0, cumulative_energy_loss  # No contribution if energy is below zero
+
+    sigma = calculate_cross_section(k_e_slice, cs_params)
+    nptmp = calculate_beam_current(k_e_slice, K_i, I0, Ze, q_ele)
+    reaction_rate = nptmp * NT * sigma
+
+    return reaction_rate, cumulative_energy_loss
+
+
 def Integral(n_slice, cs_params, sp_params, settings):
     """
     Calculate the total reaction rate by integrating over the projectile path.
 
-    This function divides the projectile path into a specified number of slices, calculates
-    the kinetic energy, cross-section, and stopping power for each slice, and integrates
+    This function divides the projectile path into a specified number of slices and integrates
     the reaction rate over the entire path.
 
     Parameters:
@@ -241,53 +417,22 @@ def Integral(n_slice, cs_params, sp_params, settings):
         settings (dict): Dictionary of additional parameters required for the calculation.
 
     Returns:
-        The distance at which the projectile stops.
-        The function prints the estimated reaction rate.
+        tuple: The total reaction rate and the distance at which the projectile stops.
     """
+    # Get initial parameters
+    ZI, AI, K_i, Ze, I0, rhot, total_thickness, q_ele, Mp, cs, NT = calculate_initial_parameters(settings)
 
-    ZI = float(settings.get('zi')) #Atomic number
-    AI = float(settings.get('ai')) #Mass number
-    K_i = float(settings.get('k_i')) #Initial kinetic energy
-    Ze = float(settings.get('ze')) #Charge state of the accelerated ion
-    I0 = float(settings.get('i0')) #Initial beam current
-    rhot = float(settings.get('rhot')) #Target density
-    I=settings.get('i') #Isotope
-    total_thickness=float(settings.get('total_thickness')) #Slice thickness in mm
-    
-
-    Iso=Isotope(I)
-    PA=Iso.mass 
-    #You multiply by 3600 because the library provides the half-life in hours and we need it in seconds
-    HL=(Iso.half_life(Iso.optimum_units())*3600) #half life of the isotope
-    decay_constant=ln(2)/(HL) 
-
-    Mp= float(settings.get('mp'))  #Mass of a proton
-    q_ele= float(settings.get('q_ele')) #Charge of an electtron
-    cs= float(settings.get('cs')) #Speed of the light
-    NA= float(settings.get('na')) #Avogadro number
-    NT=0.01*rhot*NA*total_thickness/PA # Number of nuclei per unit area, where I multiply by 0.01 to express NT in nuclei per square millimeter (1/mm^2)
-
+    # Initialize variables
     slice_thickness = total_thickness / n_slice
-
     cumulative_energy_loss = 0
     rval = 0
+    projectile_path = total_thickness  # Default value if the projectile does not stop
 
-
-    for k in range(n_slice): # This is the actual integral.
-        energy_loss = stopping_power(slice_thickness*k, **sp_params)*slice_thickness # Calculate the energy lost in the k-th slice
-        cumulative_energy_loss += energy_loss # Update the cumulative energy loss
-    
-        k_e_slice = K_i - cumulative_energy_loss  # Calculate the kinetic energy for this slice
-        if k_e_slice < 0:
-            k_e_slice = 0
-            projectil_path= slice_thickness*k
+    for k in range(n_slice):
+        reaction_rate, cumulative_energy_loss = integrate_slice(slice_thickness, k, cumulative_energy_loss, cs_params, sp_params, K_i, I0, Ze, q_ele, NT)
+        rval += reaction_rate
+        if cumulative_energy_loss >= K_i:
+            projectile_path = slice_thickness * k
             break
 
-        sgm = cross_section(k_e_slice,**cs_params)*10**(-22)  # calculate the cross-section in mm².
-        Itmp = I0 * np.sqrt(k_e_slice / K_i)  # Beam current in amperes (A) in the k-th slice.
-        nptmp = Itmp / (Ze * q_ele)  # Number of particles in the beam in the k-th slice.
-        rval += nptmp * NT * sgm   # Add reaction rate for this slice
-
-
-  
-    return rval, projectil_path
+    return rval, projectile_path
