@@ -324,52 +324,32 @@ def calculate_initial_parameters(settings):
     
     return ZI, AI, K_i, Ze, I0, rhot, total_thickness, q_ele, Mp, cs, NT
 
-def calculate_energy_loss(slice_thickness, k, cumulative_energy_loss, sp_params):
+def calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele):
     """
-    Calculate the cumulative energy loss in the k-th slice.
-
-    Parameters:
-        slice_thickness (float): Thickness of the slice.
-        k (int): Current slice index.
-        cumulative_energy_loss (float): The cumulative energy loss so far.
-        sp_params (dict): Parameters for the stopping power model.
-
-    Returns:
-        float: Updated cumulative energy loss after the current slice.
-    """
-    energy_loss = stopping_power(slice_thickness * k, **sp_params) * slice_thickness
-    return cumulative_energy_loss + energy_loss
-
-def calculate_cross_section(k_e_slice, cs_params):
-    """
-    Calculate the cross-section for the given kinetic energy slice.
+    Calculate the cross-section, beam current, and cumulative energy loss for a given kinetic energy slice.
 
     Parameters:
         k_e_slice (float): Kinetic energy in the current slice.
         cs_params (dict): Parameters for the cross-section model.
-
-    Returns:
-        float: Cross-section in mm².
-    """
-    return cross_section(k_e_slice, **cs_params) * 10**(-22)
-
-
-def calculate_beam_current(k_e_slice, K_i, I0, Ze, q_ele):
-    """
-    Calculate the beam current and number of particles for a given kinetic energy slice.
-
-    Parameters:
-        k_e_slice (float): Kinetic energy in the current slice.
+        sp_params (dict): Parameters for the stopping power model.
         K_i (float): Initial kinetic energy.
         I0 (float): Initial beam current.
         Ze (float): Charge state of the ion.
         q_ele (float): Charge of an electron.
 
     Returns:
-        float: The number of particles in the beam for this slice.
+        tuple: Cross-section, beam current, and cumulative energy loss for the given slice.
     """
+    sigma = cross_section(k_e_slice, **cs_params) * 10**(-22)  # Convert to mm²
+
     Itmp = I0 * np.sqrt(k_e_slice / K_i)
-    return Itmp / (Ze * q_ele)
+    beam_current = Itmp / (Ze * q_ele)
+    
+
+    energy_loss = stopping_power(k_e_slice, **sp_params)
+    
+    return sigma, beam_current, energy_loss
+
 
 def integrate_slice(slice_thickness, k, cumulative_energy_loss, cs_params, sp_params, K_i, I0, Ze, q_ele, NT):
     """
@@ -390,15 +370,17 @@ def integrate_slice(slice_thickness, k, cumulative_energy_loss, cs_params, sp_pa
     Returns:
         tuple: Reaction rate contribution for this slice and the updated cumulative energy loss.
     """
-    cumulative_energy_loss = calculate_energy_loss(slice_thickness, k, cumulative_energy_loss, sp_params)
+
+    energy_loss = stopping_power(slice_thickness * k, **sp_params) * slice_thickness
+    cumulative_energy_loss += energy_loss
+
     k_e_slice = K_i - cumulative_energy_loss
     if k_e_slice < 0:
         k_e_slice = 0
         return 0, cumulative_energy_loss  # No contribution if energy is below zero
 
-    sigma = calculate_cross_section(k_e_slice, cs_params)
-    nptmp = calculate_beam_current(k_e_slice, K_i, I0, Ze, q_ele)
-    reaction_rate = nptmp * NT * sigma
+    sigma, beam_current, _ = calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele)
+    reaction_rate = beam_current * NT * sigma
 
     return reaction_rate, cumulative_energy_loss
 
