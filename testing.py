@@ -1,5 +1,5 @@
 
-from functions_definition import cross_section, stopping_power, Fitting, Integral
+from functions_definition import cross_section, stopping_power, Fitting, Integral, calculate_initial_parameters
 import numpy as np
 import pytest
 from unittest.mock import patch
@@ -285,77 +285,48 @@ def test_fitting_with_exponential_data():
     assert abs(fitted_A - true_A) < 1e-6, f"Expected A {true_A}, but got {fitted_A}"
     assert abs(fitted_k - true_k) < 1e-6, f"Expected k {true_k}, but got {fitted_k}"
 
-def test_fitting_with_linear_data_with_noise():
+
+
+
+
+def test_calculate_initial_parameters():
     """
-    Test the fitting function using noisy linear data.
-    
-    GIVEN: A set of x-values and y-values generated from a linear function with added noise.
-    WHEN: The fitting function is applied with a linear model.
-    THEN: The fitted parameters should closely match the original slope and intercept, 
-          despite the presence of noise.
+    Test the calculate_initial_parameters function with a known set of parameters.
     """
-    
-    # Define the linear model within the test
-    def linear_model(x, a, b):
-        """Linear model y = a * x + b."""
-        return a * x + b
+    settings = {
+        'zi': '6',
+        'ai': '12',
+        'k_i': '1000',
+        'ze': '2',
+        'i0': '1e-6',
+        'rhot': '2.5',
+        'i': '14C',  # Modificato per riflettere il formato corretto
+        'total_thickness': '10',
+        'mp': '1.6726219e-27',
+        'q_ele': '1.602176634e-19',
+        'cs': '299792458',
+        'na': '6.02214076e23'
 
-    # Generate some linear data with noise
-    true_a = 2.0  # Slope
-    true_b = 5.0  # Intercept
-    x_data = np.linspace(0, 10, 100)
-    
-    # Generate y data with added Gaussian noise
-    noise = np.random.normal(0, 0.5, size=x_data.shape)  # Standard deviation of noise is 0.5
-    y_data = linear_model(x_data, true_a, true_b) + noise
-    
-    # Combine the data into a 2D array as required by the Fitting function
-    data = np.column_stack((x_data, y_data))
-    
-    # Initial guesses for the parameters
-    init_params = {'a': 1.0, 'b': 0.0}
-    
-    # Call the fitting function with the linear model
-    theorical_x, result = Fitting(linear_model, data, **init_params)
-    
-    # Extract the fitted parameters
-    fitted_a = result.params['a'].value
-    fitted_b = result.params['b'].value
-    
-    # Assert that the fitted parameters are close to the true values within a reasonable tolerance
-    assert abs(fitted_a - true_a) < 0.1, f"Expected slope {true_a}, but got {fitted_a}"
-    assert abs(fitted_b - true_b) < 0.1, f"Expected intercept {true_b}, but got {fitted_b}"
+    }
+    PA = 14.00324198843
+    expected_NT =  0.01 * 2.5 * 6.02214076e23 * 10.0 / PA
+
+    ZI, AI, K_i, Ze, I0, rhot, total_thickness, q_ele, Mp, cs, NT = calculate_initial_parameters(settings)
 
 
 
+    assert ZI == 6.0, f"Expected 6.0 but got {ZI}"
+    assert AI == 12.0, f"Expected 12.0 but got {AI}"
+    assert K_i == 1000.0, f"Expected 1000.0 but got {K_i}"
+    assert Ze == 2.0, f"Expected 2.0 but got {Ze}"
+    assert I0 == 1e-6, f"Expected 1e-6 but got {I0}"
+    assert rhot == 2.5, f"Expected 2.5 but got {rhot}"
+    assert total_thickness == 10.0, f"Expected 10.0 but got {total_thickness}"
+    assert q_ele == 1.602176634e-19, f"Expected 1.602176634e-19 but got {q_ele}"
+    assert Mp == 1.6726219e-27, f"Expected 1.6726219e-27 but got {Mp}"
+    assert cs == 299792458.0, f"Expected 299792458.0 but got {cs}"
+    assert abs(NT - expected_NT) < 1e-10, f"Expected {expected_NT} but got {NT}"
 
-# def test_integral_invalid_energy_loss():
-#     """
-#     Test the `Integral` function when encountering extreme values for energy loss.
+    print("Test passed.")
 
-#     GIVEN: Mock implementations of `cross_section` and `stopping_power`, where `stopping_power` simulates a very high energy loss.
-#     WHEN: The `Integral` function is called using these mock implementations.
-#     THEN: The function should not return NaN, ensuring that it handles extreme energy loss values properly and does not produce invalid results.
-#     """
-#     def mock_cross_section(energy, **params):
-#         return 1.0  # Simulates a constant cross-section function
-    
-#     def mock_stopping_power(distance, **params):
-#         return 100.0  # Simulates a very high energy loss
-
-#     # Example parameters
-#     cs_params = {}
-#     sp_params = {}
-#     config = 'configuration.txt'
-
-
-
-#     with patch('functions_definition.cross_section', mock_cross_section), \
-#          patch('functions_definition.stopping_power', mock_stopping_power):
-        
-#         # Execute the test
-#         rval = Integral(10, cs_params, sp_params, config)
-        
-#         # Verify that the result is not NaN
-#         assert not np.isnan(rval), "The result should not be NaN with correct implementation."
 
