@@ -1,8 +1,9 @@
 
-from functions_definition import cross_section, stopping_power, Fitting, Integral, calculate_initial_parameters, calculate_slice_params
+from functions_definition import cross_section, stopping_power, Fitting, Integral, calculate_initial_parameters, calculate_slice_params, integrate_slice, Integral
 import numpy as np
 import pytest
 from unittest.mock import patch
+
 
 # cross_section function tests
 
@@ -300,7 +301,7 @@ def test_calculate_initial_parameters():
         'ze': '2',
         'i0': '1e-6',
         'rhot': '2.5',
-        'i': '14C',  # Modificato per riflettere il formato corretto
+        'i': '14C',  
         'total_thickness': '10',
         'mp': '1.6726219e-27',
         'q_ele': '1.602176634e-19',
@@ -348,12 +349,12 @@ def test_calculate_slice_params():
 
     expected_sigma = 10**(-24)
     expected_beam_current = 6.7353198
-    expected_energy_loss = 2.0*10**(-3)
+
     with patch('functions_definition.cross_section', return_value=mock_cross_section), \
          patch('functions_definition.stopping_power', return_value=mock_stopping_power):
         
 
-        sigma, beam_current, energy_loss = calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele)
+        sigma, beam_current= calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele)
 
    
 
@@ -361,7 +362,117 @@ def test_calculate_slice_params():
     
         assert abs(sigma - expected_sigma) < 1e-3, f"Expected sigma: {expected_sigma}, but got {sigma}"
         assert abs(beam_current - expected_beam_current) < 1e-3, f"Expected beam_current: {expected_beam_current}, but got {beam_current}"
-        assert abs(energy_loss - expected_energy_loss) < 1e-3, f"Expected energy_loss: {expected_energy_loss}, but got {energy_loss}"
     
     print('test passed')
 
+
+
+def test_integrate_slice():
+    """
+    Test the integrate_slice function using known inputs and expected outputs.
+    
+    GIVEN: A set of parameters for stopping power and cross section.
+    WHEN: The integrate_slice function is called.
+    THEN: The reaction rate and cumulative energy loss should match the expected values.
+    """
+    
+
+    slice_thickness = 5
+    k = 5
+    cumulative_energy_loss = 1
+    cs_params = {"xc": 4, "A": 10, "sigma": 0.5, "tau": 0.6}
+    sp_params = {"xc": 2, "A": 10, "sigma": 0.5, "tau": 0.6, "C1": 5}  # Parametri aggiornati
+    K_i = 1000
+    I0 = 1e-6
+    Ze = 1
+    q_ele = 1.60217662e-19
+    NT =20
+    
+    expected_reaction_rate = 800  # sigma*beam_current*NT
+    expected_cumulative_energy_loss = 101  # cumulative_energy_loss+ (stopping_power*slice_thikness)
+    with patch('functions_definition.stopping_power', return_value=20) as mock_stopping_power, \
+         patch('functions_definition.calculate_slice_params', return_value=(5, 8)) as mock_calculate_slice_params:
+
+        reaction_rate, cumulative_energy_loss = integrate_slice(
+            slice_thickness, k, cumulative_energy_loss, cs_params, sp_params, K_i, I0, Ze, q_ele, NT)
+
+        assert np.isclose(reaction_rate, expected_reaction_rate, rtol=1e-3), \
+            f"Expected reaction rate {expected_reaction_rate}, but got {reaction_rate}"
+        
+        assert np.isclose(cumulative_energy_loss, expected_cumulative_energy_loss, rtol=1e-3), \
+            f"Expected cumulative energy loss {expected_cumulative_energy_loss}, but got {cumulative_energy_loss}"
+
+
+
+def test_integral():
+    """
+    Test the Integral function for calculating total reaction rate and projectile path.
+
+    GIVEN: 
+        - Number of slices: 10
+        - Cross-section parameters and stopping power parameters
+        - Settings with a total thickness of 90
+
+    WHEN: 
+        - Called with mock values for the reaction rate and cumulative energy loss.
+
+    THEN: 
+        - Verify that the computed integral matches the expected total.
+        - Verify that the path matches the expected stopping distance.
+    """
+    
+    n_slice = 10
+    cs_params = {"xc": 1, "A": 10, "sigma": 0.5, "tau": 6}
+    sp_params = {"xc": 2, "A": 10, "sigma": 0.5, "tau": 6, "C1": 5}
+
+    settings = {
+        "zi": 1,          
+        "ai": 1,          
+        "k_i": 100,      
+        "ze": 1,          
+        "i0": 1e-6,       
+        "rhot": 1e18,     
+        "total_thickness": 90, 
+        "q_ele": 1.60217662e-19, 
+        "mp": 1.67e-27,  
+        "cs": 3,        
+        "na": 1e18,       
+        "i" : "14C"
+    }
+
+    expected_integral= 50 # n_slice * slice_integral
+    expected_path= 90 
+
+    with patch('functions_definition.integrate_slice', return_value=(5,8)) as mock_integrate_slice:
+
+
+    
+ 
+
+        integral, path=Integral(n_slice, cs_params, sp_params, settings)
+ 
+        assert np.isclose(integral, expected_integral, rtol=1e-3), \
+            f"Expected integral {expected_integral}, but got {integral}"
+        
+        assert np.isclose(path, expected_path, rtol=1e-3), \
+            f"Expected path {expected_path}, but got {path}"
+
+        
+    expected_integral_2 = 30 
+    expected_path_2 = 45 #half path (thotal_thikness : 2)
+
+    def mock_integrate_slice(slice_thickness, k, cumulative_energy_loss, cs_params, sp_params, K_i, I0, Ze, q_ele, NT):
+        if k < 0.5*n_slice: 
+            return 6, cumulative_energy_loss  
+        else:
+            return 0, K_i 
+
+    
+    with patch('functions_definition.integrate_slice', side_effect=mock_integrate_slice):
+        integral, path = Integral(n_slice, cs_params, sp_params, settings)
+        
+        assert np.isclose(integral, expected_integral_2, rtol=1e-3), \
+            f"Expected integral {expected_integral_2}, but got {integral}"
+        
+        assert np.isclose(path, expected_path_2, rtol=1e-3), \
+            f"Expected path {expected_path_2}, but got {path}"
