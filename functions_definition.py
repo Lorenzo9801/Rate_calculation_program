@@ -29,15 +29,12 @@ def load_config(config_file="configuration.txt"):
 
     config_dict = {}
     
-    # Process 'paths' section
     for key in config.options('paths'):
         config_dict[key] = config.get('paths', key)
 
-    # Process 'settings' section
     for key in config.options('settings'):
         config_dict[key] = config.get('settings', key)
 
-    # Process 'costants' section
     for key in config.options('costants'):
         config_dict[key] = config.get('costants', key)
 
@@ -260,7 +257,7 @@ def calculate_initial_parameters(settings):
 
 def calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele):
     """
-    Calculate the cross-section, beam current, and cumulative energy loss for a given kinetic energy slice.
+    Calculate the cross-section and beam current for a given kinetic energy slice.
 
     Parameters:
         k_e_slice (float): Kinetic energy in the current slice.
@@ -272,7 +269,7 @@ def calculate_slice_params(k_e_slice, cs_params, sp_params, K_i, I0, Ze, q_ele):
         q_ele (float): Charge of an electron.
 
     Returns:
-        tuple: Cross-section, beam current, and cumulative energy loss for the given slice.
+        tuple: Cross-section and beam current for the given slice.
     """
     sigma = cross_section(k_e_slice, **cs_params) * 10**(-22)  # Convert to mm²
 

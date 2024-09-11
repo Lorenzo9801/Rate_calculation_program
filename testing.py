@@ -139,7 +139,7 @@ def test_stopping_power_at_infinity():
     
     assert result < 1e-6, f"Stopping power at x=1000 should be near zero, got {result}"
 
-def test_stopping_power_with_different_A():
+def test_stopping_power_amplitude():
     """
     Test the effect of changing A on the stopping power.
     
@@ -159,7 +159,7 @@ def test_stopping_power_with_different_A():
     
     assert results[0] < results[1] < results[2], f"Stopping power should increase with A, got {results}"
 
-def test_stopping_power_with_different_sigma():
+def test_stopping_power_sigma():
     """
     Test the effect of changing sigma on the stopping power.
     
@@ -177,8 +177,8 @@ def test_stopping_power_with_different_sigma():
     
     results = [stopping_power(x, xc, A, sigma, tau, C1) for sigma in sigma_values]
     
-    # Check that the stopping power decreases with increasing sigma
     assert results[0] > results[1] > results[2], f"Stopping power should decrease with increasing sigma, got {results}"
+
 
 
 # Fitting tests
@@ -194,7 +194,7 @@ def test_fitting_with_linear_data():
     """
 
     def linear_model(x, m, b):
-        """Simple linear model y = m*x + b."""
+
         return m * x + b
 
     true_m = 2.0
@@ -225,7 +225,7 @@ def test_fitting_with_parabolic_data():
     """
 
     def parabolic_model(x, a, b, c):
-        """Simple parabolic model y = a*x^2 + b*x + c."""
+
         return a * x**2 + b * x + c
 
     true_a = 1.0
@@ -260,7 +260,7 @@ def test_fitting_with_exponential_data():
     
     # Define the exponential model within the test
     def exponential_model(x, A, k):
-        """Simple exponential model y = A * exp(k * x)."""
+
         return A * np.exp(k * x)
 
     # Generate some perfect exponential data
@@ -288,6 +288,7 @@ def test_fitting_with_exponential_data():
 
 
 
+#Integral tests
 
 
 def test_calculate_initial_parameters():
@@ -328,7 +329,7 @@ def test_calculate_initial_parameters():
     assert cs == 299792458.0, f"Expected 299792458.0 but got {cs}"
     assert abs(NT - expected_NT) < 1e-10, f"Expected {expected_NT} but got {NT}"
 
-    print("Test passed.")
+
 
 
 def test_calculate_slice_params():
@@ -362,8 +363,7 @@ def test_calculate_slice_params():
     
         assert abs(sigma - expected_sigma) < 1e-3, f"Expected sigma: {expected_sigma}, but got {sigma}"
         assert abs(beam_current - expected_beam_current) < 1e-3, f"Expected beam_current: {expected_beam_current}, but got {beam_current}"
-    
-    print('test passed')
+
 
 
 
@@ -381,7 +381,7 @@ def test_integrate_slice():
     k = 5
     cumulative_energy_loss = 1
     cs_params = {"xc": 4, "A": 10, "sigma": 0.5, "tau": 0.6}
-    sp_params = {"xc": 2, "A": 10, "sigma": 0.5, "tau": 0.6, "C1": 5}  # Parametri aggiornati
+    sp_params = {"xc": 2, "A": 10, "sigma": 0.5, "tau": 0.6, "C1": 5} 
     K_i = 1000
     I0 = 1e-6
     Ze = 1
